@@ -26,6 +26,7 @@ Your PWS needs to support WS View
 
 ## Devices
 ![Devices](/images/screendump.jpg)
+
 | Name                 | Description
 | :---                 | :---
 | Chill                | Chill (calculated when `Ecowitt` protocol is used)
