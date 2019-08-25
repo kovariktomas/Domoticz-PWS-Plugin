@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Basic Python Plugin Example
+# Personal Weather Station 
 #
 # Author: Xorfor
 #
