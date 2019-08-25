@@ -4,17 +4,18 @@ This Domoticz Plugin allows you to get the data directly from your own personal 
 ## Prerequisites
 Your PWS needs to support WS View
 
-Install WS View on your device
-Follow the instructions from the manual to connect your PWS to internet
-Click on Next untill you are on on the Customized page (Do NOT choose for WeatherUnderground, Ecowitt, WeatherCloud, etc.)
-Choose `Enable`
-For `Protocol Type Same As` choose `Wunderground`
-For `Server IP / Hostname` enter your Domotiz Server ip address, eg. 192.168.0.10
-You can leave blank `Station ID` 
-You can leave blank `Station Key`
-`Port` enter a free port number, eg. `5000`
-`Upload Interval`, leave it `60` seconds
-Click on `Save`
+1. Install WS View on your mobile device
+2. Follow the instructions from the manual to connect to your PWS
+3. Click on Next untill you are on on the `Customized` page (Do NOT choose for WeatherUnderground, Ecowitt, WeatherCloud, etc.)
+4. Choose `Enable`
+5. For `Protocol Type Same As` choose `Wunderground`
+6. For `Server IP / Hostname` enter your Domotiz Server ip address, eg. 192.168.0.10
+7. If you choose for `Wunderground` protocol:
+    * Fill in `Station ID` with a value
+    * Fill in `Station Key` with a value
+8. `Port` enter a free port number, eg. `5000`
+9. `Upload Interval`, leave it `60` seconds
+10. Click on `Save`
 
 ## Parameters
 | Name                 | Description
@@ -22,16 +23,16 @@ Click on `Save`
 | Port                 | Port number as choosen in WS View, eg. 5000
 
 ## Devices
+![Devices](/blob/master/images/screendump.jpg)
 | Name                 | Description
 | :---                 | :---
-| Chill                | Chill
-| Dew point            | Dew point
+| Chill                | Chill (calculated when `Ecowitt` protocol is used)
+| Dew point            | Dew point (calculated when `Ecowitt` protocol is used)
 | Gust                 | Gust
 | Humidity             | Humidity
 | Humidity (indoor)    | Humidity (indoor)
-| Protocol             | Choose protocol in WS Tools, `Wunderground` or `Ecowitt`
 | Rain                 | Current rain rate and daily total
-| Software             | Software used in your PWS to send the data
+| Station              | ip adress:port from your PWS (Software): Protocol (`Wunderground` or `Ecowitt`)
 | Solar radiation      | Solar radiation
 | Temp + Hum           | Temperature and humidity
 | Temperature          | Temperature
