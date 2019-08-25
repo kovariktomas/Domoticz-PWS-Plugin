@@ -23,11 +23,11 @@ Your PWS needs to be connected to your router by WS View (and probably also the 
 ## Installation
 
 1. Clone repository into your Domoticz plugins folder
-```
-cd domoticz/plugins
-git clone https://github.com/Xorfor/Domoticz-PWS-Plugin.git
-```
-1. Restart domoticz
+    ```
+    cd domoticz/plugins
+    git clone https://github.com/Xorfor/Domoticz-PWS-Plugin.git
+    ```
+2. Restart domoticz
 1. Make sure that "Accept new Hardware Devices" is enabled in Domoticz settings
 1. Go to "Hardware" page and add new hardware with Type "PWS"
 
