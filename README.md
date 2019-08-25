@@ -20,8 +20,6 @@ Your PWS needs to support WS View. With this application you can connect your PW
 1. `Upload Interval`, leave it `60` seconds
 1. Click on `Save`
 
-## Installation
-
 ## Parameters
 | Name                 | Description
 | :---                 | :---
