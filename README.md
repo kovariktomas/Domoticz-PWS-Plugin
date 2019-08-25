@@ -5,6 +5,8 @@ This Domoticz Plugin allows you to get the data directly from your own personal 
 Your PWS needs to support WS View
 
 1. Install WS View on your mobile device
+    * [Google Play Store](https://play.google.com/store/apps/details?id=com.ost.wsview)
+    * [Apple App Store](https://apps.apple.com/us/app/ws-view/id1362944193)
 2. Follow the instructions from the manual to connect to your PWS
 3. Click on Next untill you are on on the `Customized` page (Do NOT choose for WeatherUnderground, Ecowitt, WeatherCloud, etc.)
 4. Choose `Enable`
@@ -23,7 +25,7 @@ Your PWS needs to support WS View
 | Port                 | Port number as choosen in WS View, eg. 5000
 
 ## Devices
-![Devices](/blob/master/images/screendump.jpg)
+![Devices](/images/screendump.jpg)
 | Name                 | Description
 | :---                 | :---
 | Chill                | Chill (calculated when `Ecowitt` protocol is used)
