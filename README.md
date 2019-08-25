@@ -20,6 +20,17 @@ Your PWS needs to be connected to your router by WS View (and probably also the 
 1. `Upload Interval`, leave it `60` seconds
 1. Click on `Save`
 
+## Installation
+
+1. Clone repository into your Domoticz plugins folder
+```
+cd domoticz/plugins
+git clone https://github.com/Xorfor/Domoticz-PWS-Plugin.git
+```
+1. Restart domoticz
+1. Make sure that "Accept new Hardware Devices" is enabled in Domoticz settings
+1. Go to "Hardware" page and add new hardware with Type "PWS"
+
 ## Parameters
 | Name                 | Description
 | :---                 | :---
@@ -43,6 +54,7 @@ Your PWS needs to be connected to your router by WS View (and probably also the 
 | Temperature (indoor) | Temperature
 | THB                  | Temperature, humidity and barometer (pressure and prediction)
 | UVI                  | UV index
+| UV Alert             | (calculated)
 | Wind                 | Wind direction, speed and gust
 | Wind                 | Wind direction, speed, gust, temperature and gust
 | Wind Speed           | Wind speed
