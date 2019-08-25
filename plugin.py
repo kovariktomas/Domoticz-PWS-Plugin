@@ -37,6 +37,7 @@ class BasePlugin:
     __UNIT_RAIN = 6
     __UNIT_SOLR = 7
     __UNIT_UVID = 8
+    __UNIT_UVAT = 16
     __UNIT_DEWP = 9
     __UNIT_WND2 = 10
     __UNIT_CHLL = 11
@@ -58,6 +59,7 @@ class BasePlugin:
         [__UNIT_WND1, "Wind", 86, 1, {}, __USED],
         [__UNIT_WND2, "Wind", 86, 4, {}, __USED],
         [__UNIT_UVID, "UVI", 87, 1, {}, __USED],
+        [__UNIT_UVAT, "UV Alert", 243, 22, {}, __USED],
         [__UNIT_SOLR, "Solar radiation", 243, 2, {}, __USED],
         [__UNIT_WND3, "Wind speed", 243, 31, {"Custom": "0;m/s"}, __USED],
         [__UNIT_GUST, "Gust", 243, 31, {"Custom": "0;m/s"}, __USED],
@@ -253,10 +255,14 @@ class BasePlugin:
                              int(uv),
                              "{};{}".format(uv, temp),
                              )
+                UpdateDevice(self.__UNIT_UVAT,
+                             uv2status(uv),
+                             str(uv) + " UVI",
+                             )
                 UpdateDevice(self.__UNIT_SWTP,
                              0,
                              "{} ({}): {}".format(
-                                 Connection.Name, softwaretype, protocol),
+                                 Connection.Address, softwaretype, protocol),
                              )
                 UpdateDevice(self.__UNIT_THB1,
                              0,
@@ -458,6 +464,19 @@ def pressure2status(pressure):
         return BARO_FORECAST_PARTLYCLOUDY
     else:
         return BARO_FORECAST_SUNNY
+
+
+def uv2status(value):
+    if value < 3:
+        return 0
+    elif value < 6:
+        return 1
+    elif value < 8:
+        return 2
+    elif value < 11:
+        return 3
+    else:
+        return 4
 
 
 def pressure_inches2iso(value):

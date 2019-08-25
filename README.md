@@ -2,7 +2,7 @@
 This Domoticz Plugin allows you to get the data directly from your own personal weather station (PWS). This plugin does NOT require that you register your PWS to WeatherUnderground, Ecowitt, WeatherCloud, etc. This plugin will directly capture the data!
 
 ## Prerequisites
-Your PWS needs to support WS View (and probably also the older 'WS Tool'). With this application you can connect your PWS to the router. Through this application your PWS can upload weather data.
+Your PWS needs to be connected to your router by WS View (and probably also the older 'WS Tool'). With this application you can connect your PWS to the router, so that your PWS can upload weather data.
 
 1. Install WS View on your mobile device
     * [Google Play Store](https://play.google.com/store/apps/details?id=com.ost.wsview)
@@ -36,7 +36,7 @@ Your PWS needs to support WS View (and probably also the older 'WS Tool'). With 
 | Humidity             | Humidity
 | Humidity (indoor)    | Humidity (indoor)
 | Rain                 | Current rain rate and daily total
-| Station              | ip adress:port from your PWS (Software): Protocol (`Wunderground` or `Ecowitt`)
+| Station              | Format: [ip adress] ([software]): [Protocol] (`Wunderground` or `Ecowitt`), from your PWS.
 | Solar radiation      | Solar radiation
 | Temp + Hum           | Temperature and humidity
 | Temperature          | Temperature
