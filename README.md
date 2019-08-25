@@ -23,7 +23,8 @@ Your PWS needs to support WS View
 | Port                 | Port number as choosen in WS View, eg. 5000
 
 ## Devices
-![Devices](/blob/master/images/screendump.jpg)
+![Devices](/images/screendump.jpg)
+
 | Name                 | Description
 | :---                 | :---
 | Chill                | Chill (calculated when `Ecowitt` protocol is used)
