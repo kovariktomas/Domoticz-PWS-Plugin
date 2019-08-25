@@ -43,7 +43,6 @@ class BasePlugin:
     __UNIT_WND3 = 12
     __UNIT_GUST = 13
     __UNIT_SWTP = 20
-    __UNIT_PRTL = 21
 
     __UNITS = [
         # id, name, type, subtype, options, used
@@ -62,8 +61,7 @@ class BasePlugin:
         [__UNIT_SOLR, "Solar radiation", 243, 2, {}, __USED],
         [__UNIT_WND3, "Wind speed", 243, 31, {"Custom": "0;m/s"}, __USED],
         [__UNIT_GUST, "Gust", 243, 31, {"Custom": "0;m/s"}, __USED],
-        [__UNIT_SWTP, "Software", 243, 19, {}, __USED],
-        [__UNIT_PRTL, "Protocol", 243, 19, {}, __USED],
+        [__UNIT_SWTP, "Station", 243, 19, {}, __USED],
     ]
 
     def __init__(self):
@@ -102,7 +100,7 @@ class BasePlugin:
             Data,
         )
         )
-        # DumpHTTPResponseToLog(Data)
+        DumpHTTPResponseToLog(Data)
         dataIsValid = False
         # Incoming Requests
         if "Verb" in Data:
@@ -145,9 +143,43 @@ class BasePlugin:
                     preciptotal = round(distance_inch2iso(
                         float(data.get("dailyrainin"))), 1)
 
-            elif strVerb == "POST":
+            elif strVerb == "POST" and strURL == "/data/report/":
                 protocol = "Ecowitt"
                 Domoticz.Log("Ecowitt protocol")
+                strData = Data["Data"].decode("utf-8")
+                data = dict(item.split("=") for item in strData.split("&"))
+                Domoticz.Log("data: {}".format(data))
+                if len(data) > 0:
+                    dataIsValid = True
+                    # Get data
+                    humidity = int(data.get("humidity"))
+                    humiditystatus = humidity2status(humidity)
+                    indoorhumidity = int(data.get("humidityin"))
+                    indoorhumiditystatus = humidity2status(indoorhumidity)
+                    temp = round(temperature_f2iso(
+                        float(data.get("tempf"))), 1)
+                    indoortemp = round(temperature_f2iso(
+                        float(data.get("tempinf"))), 1)
+                    windspeed = round(speed_mph2iso(
+                        float(data.get("windspeedmph"))), 1)
+                    windgust = round(speed_mph2iso(
+                        float(data.get("windgustmph"))), 1)
+                    winddir = int(data.get("winddir"))
+                    pressure = pressure_inches2iso(
+                        float(data.get("baromrelin")))
+                    preciprate = round(distance_inch2iso(
+                        float(data.get("rainratein"))), 2)
+                    preciptotal = round(distance_inch2iso(
+                        float(data.get("dailyrainin"))), 1)
+                    softwaretype = data.get("stationtype")
+                    solarradiation = float(data.get("solarradiation"))
+                    uv = int(data.get("uv"))
+                    # dewpt not reported in Ecowitt
+                    dewpt = dew_point(temp, humidity) if data.get("dewptf") is None else round(
+                        temperature_f2iso(float(data.get("dewptf"))), 1)
+                    # windchill not reported in Ecowitt
+                    windchill = wind_chill(temp, windspeed) if data.get("windchillf") is None else round(
+                        temperature_f2iso(float(data.get("windchillf"))), 1)
             else:
                 Domoticz.Error("Unknown protocol")
                 dataIsValid = False
@@ -193,21 +225,25 @@ class BasePlugin:
                              "{};{};{};{};{};{}".format(
                                  winddir, bearing2status(winddir), windspeed*10, windgust*10, temp, windchill)
                              )
+                UpdateDevice(self.__UNIT_WND3,
+                             0,
+                             "{}".format(windspeed),
+                             )
+                UpdateDevice(self.__UNIT_GUST,
+                             0,
+                             "{}".format(windgust),
+                             )
                 UpdateDevice(self.__UNIT_SOLR,
                              int(solarradiation),
                              str(solarradiation),
                              )
                 UpdateDevice(self.__UNIT_UVID,
                              int(uv),
-                             "{};0".format(uv),
+                             "{};{}".format(uv, temp),
                              )
                 UpdateDevice(self.__UNIT_SWTP,
                              0,
-                             softwaretype,
-                             )
-                UpdateDevice(self.__UNIT_PRTL,
-                             0,
-                             protocol,
+                             "{} ({}): {}".format(Connection.Name, softwaretype, protocol),
                              )
                 UpdateDevice(self.__UNIT_THB1,
                              0,
@@ -363,7 +399,7 @@ def speed_mph2iso(value):
     Returns:
         speed in m/s
     """
-    return (value * 2.2369362920544)
+    return (value * 0.44704)
 
 
 def bearing2status(d):
@@ -403,8 +439,53 @@ def pressure2status(pressure):
 
 
 def pressure_inches2iso(value):
+    """Pressure conversion from inches Hg to ISO (hPa)
+    Args:
+        value (float): pressure in inches Hg
+    Returns:
+        pressure in hPa
+    """
     return value * 33.86
 
 
 def distance_inch2iso(value):
+    """Distance conversion from inches to ISO (cm)
+    Args:
+        value (float): Distance in inches
+    Returns:
+        Distance in cm
+    """
     return value * 2.54
+
+
+def dew_point(t, h):
+    """Calculate dewpoint
+    Args:
+        t (float): temperature in °C
+        h (float): relative humidity in %
+    Returns:
+        calculated dewpoint in °C
+    Ref:
+        https://www.ajdesigner.com/phphumidity/dewpoint_equation_dewpoint_temperature.php
+    """
+    return round((h / 100) ** (1 / 8) * (112 + 0.9 * t) + 0.1 * t - 112, 2)
+
+
+def wind_chill(t, v):
+    """ Windchill temperature is defined only for temperatures at or below 10 °C 
+    and wind speeds above 4.8 kilometres per hour.
+    Args:
+        t: temperature in °C
+        v: wind speed in m/s
+    Returns:
+        calculated windchill temperature in °C
+    Ref: 
+        https://en.wikipedia.org/wiki/Wind_chill
+    """
+    # Calculation expects km/h instead of m/s, so
+    v = v * 3.6
+    if t < 10 and v > 4.8:
+        v = v ** 0.16
+        return round(13.12 + 0.6215 * t - 11.37 * v + 0.3965 * t * v, 1)
+    else:
+        return t
