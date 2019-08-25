@@ -6,7 +6,7 @@
 # Author: Xorfor
 #
 """
-<plugin key="xfr_template" name="PWS" author="Xorfor" version="1.0.0">
+<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.0">
     <params>
         <param field="Port" label="Port" width="30px" required="true" default="5000"/>
         <param field="Mode6" label="Debug" width="100px">
