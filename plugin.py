@@ -225,9 +225,21 @@ class BasePlugin:
                              "{};{};{};{};{};{}".format(
                                  winddir, bearing2status(winddir), windspeed*10, windgust*10, temp, windchill)
                              )
+                # Custom device, so we have to handle the alternative windspeed units
+                windunit = int(Settings["WindUnit"])
+                Domoticz.Log("WindUnit: {}".format(windunit))
+                UpdateDeviceOptions(
+                    self.__UNIT_WND3, Options=speed2options(windunit))
                 UpdateDevice(self.__UNIT_WND3,
                              0,
-                             "{}".format(windspeed),
+                             "{}".format(speed2unit(windspeed, windunit)),
+                             )
+                # Custom device, so we have to handle the alternative windspeed units
+                UpdateDeviceOptions(
+                    self.__UNIT_GUST, Options=speed2options(windunit))
+                UpdateDevice(self.__UNIT_GUST,
+                             0,
+                             "{}".format(speed2unit(windgust, windunit))
                              )
                 UpdateDevice(self.__UNIT_GUST,
                              0,
@@ -243,7 +255,8 @@ class BasePlugin:
                              )
                 UpdateDevice(self.__UNIT_SWTP,
                              0,
-                             "{} ({}): {}".format(Connection.Name, softwaretype, protocol),
+                             "{} ({}): {}".format(
+                                 Connection.Name, softwaretype, protocol),
                              )
                 UpdateDevice(self.__UNIT_THB1,
                              0,
@@ -361,6 +374,15 @@ def UpdateDevice(Unit, nValue, sValue, TimedOut=0, AlwaysUpdate=False):
                 nValue=nValue, sValue=str(sValue), TimedOut=TimedOut)
             Domoticz.Debug(
                 "Update {}: {} - {} - {}".format(Devices[Unit].Name, nValue, sValue, TimedOut))
+
+
+def UpdateDeviceOptions(Unit, Options={}):
+    if Unit in Devices:
+        if Devices[Unit].Options != Options:
+            Devices[Unit].Update(nValue=Devices[Unit].nValue,
+                                 sValue=Devices[Unit].sValue, Options=Options)
+            Domoticz.Debug("Device Options update: {}={}".format(
+                Devices[Unit].Name, Options))
 
 
 ################################################################################
@@ -489,3 +511,86 @@ def wind_chill(t, v):
         return round(13.12 + 0.6215 * t - 11.37 * v + 0.3965 * t * v, 1)
     else:
         return t
+
+
+WIND_SPEED_MS = 0
+WIND_SPEED_KMH = 1
+WIND_SPEED_MPH = 2
+WIND_SPEED_KNOTS = 3
+WIND_SPEED_BEAUFORT = 4
+WIND_SPEED_ISO = WIND_SPEED_MS
+WIND_SPEEDS = {
+    WIND_SPEED_MS,
+    WIND_SPEED_KMH,
+    WIND_SPEED_MPH,
+    WIND_SPEED_KNOTS,
+    WIND_SPEED_BEAUFORT,
+}
+
+
+def speed2unit(speed, unit):
+    """Convert the windspeed (in m/s) to the given unit
+    Args:
+        speed: windspeed in m/s
+        unit: the new unit for windspeed
+    Returns:
+        calculated windspeed for the given unit
+    """
+    if unit in WIND_SPEEDS:
+        if unit == WIND_SPEED_ISO:
+            return speed
+        elif unit == WIND_SPEED_KMH:
+            return round(speed * 3.60000000,1 )
+        elif unit == WIND_SPEED_MPH:
+            return round(speed * 2.23693629,1)
+        elif unit == WIND_SPEED_KNOTS:
+            return round(speed * 1.94384449,1)
+        elif unit == WIND_SPEED_BEAUFORT:
+            if 0 <= speed < 0.3:
+                return 0
+            elif 0.3 <= speed < 1.6:
+                return 1
+            elif 1.6 <= speed < 3.4:
+                return 2
+            elif 3.4 <= speed < 5.5:
+                return 3
+            elif 5.5 <= speed < 8.0:
+                return 4
+            elif 8.0 <= speed < 10.8:
+                return 5
+            elif 10.8 <= speed < 13.9:
+                return 6
+            elif 13.9 <= speed < 17.2:
+                return 7
+            elif 17.2 <= speed < 20.8:
+                return 8
+            elif 20.8 <= speed < 24.5:
+                return 9
+            elif 24.5 <= speed < 28.5:
+                return 10
+            elif 28.5 <= speed < 32.7:
+                return 11
+            elif 32.7 <= speed:
+                return 12
+        else:
+            return None
+    else:
+        return None
+
+
+def speed2options(unit):
+    if unit in WIND_SPEEDS:
+        if unit == WIND_SPEED_ISO:
+            return {"Custom": "0;m/s"}
+        elif unit == WIND_SPEED_KMH:
+            return {"Custom": "0;km/h"}
+        elif unit == WIND_SPEED_MPH:
+            return {"Custom": "0;mph"}
+        elif unit == WIND_SPEED_KNOTS:
+            return {"Custom": "0;kn"}
+        elif unit == WIND_SPEED_BEAUFORT:
+            return {"Custom": "0;bf"}
+        else:
+            return {}
+    else:
+        return {}
