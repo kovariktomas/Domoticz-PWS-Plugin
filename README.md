@@ -29,7 +29,7 @@ Unfortunately you can connect your PWS only to one Domoticz server!
     cd domoticz/plugins
     git clone https://github.com/Xorfor/Domoticz-PWS-Plugin.git
     ```
-2. Restart domoticz
+1. Restart domoticz
     ```
     sudo service domoticz.sh restart
     ```
@@ -42,6 +42,11 @@ Unfortunately you can connect your PWS only to one Domoticz server!
     cd domoticz/plugins/Domoticz-PWS-Plugin
     git pull
     ```
+1. Restart domoticz
+    ```
+    sudo service domoticz.sh restart
+    ```
+If new devices are added in the plugin, you have to remove the hardware and add it again (sorry!).
 
 ## Parameters
 | Name                 | Description
