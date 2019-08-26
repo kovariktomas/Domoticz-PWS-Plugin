@@ -21,6 +21,7 @@ Your PWS needs to be connected to your router by WS View (and probably also the 
 1. Click on `Save`
 
 Now your PWS will start to upload its data to your Domoticz server at the specified port. Now we need to install the Domoticz plugin to created the required devices, listen to the specified port, retrieve the data and update the devices with the latest information.
+Unfortunately you can connect your PWS only to one Domoticz server!
 
 ## Installation
 1. Clone repository into your Domoticz plugins folder
@@ -29,6 +30,9 @@ Now your PWS will start to upload its data to your Domoticz server at the specif
     git clone https://github.com/Xorfor/Domoticz-PWS-Plugin.git
     ```
 2. Restart domoticz
+    ```
+    sudo service domoticz.sh restart
+    ```
 1. Make sure that "Accept new Hardware Devices" is enabled in Domoticz settings
 1. Go to "Hardware" page and add new hardware with Type "PWS"
 
