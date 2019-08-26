@@ -20,6 +20,8 @@ Your PWS needs to be connected to your router by WS View (and probably also the 
 1. `Upload Interval`, leave it `60` seconds
 1. Click on `Save`
 
+Now your PWS will start to upload its data to your Domoticz server at the specified port. Now we need to install the Domoticz plugin to created the required devices, listen to the specified port, retrieve the data and update the devices with the latest information.
+
 ## Installation
 1. Clone repository into your Domoticz plugins folder
     ```
@@ -45,6 +47,8 @@ Your PWS needs to be connected to your router by WS View (and probably also the 
 ## Devices
 ![Devices](/images/screendump.jpg)
 
+I have created as much devices as possible, so you can select your own favourites.
+
 | Name                 | Description
 | :---                 | :---
 | Chill                | Chill (calculated when `Ecowitt` protocol is used)
@@ -52,6 +56,8 @@ Your PWS needs to be connected to your router by WS View (and probably also the 
 | Gust                 | Gust
 | Humidity             | Humidity
 | Humidity (indoor)    | Humidity (indoor)
+| Pressure (absolute)  | Pressure (absolute) in hPa (not implemented yet)
+| Pressure (relative)  | Pressure (relative) in hPa (not implemented yet)
 | Rain                 | Current rain rate and daily total
 | Station              | Format: [ip adress] ([software]): [Protocol] (`Wunderground` or `Ecowitt`), from your PWS.
 | Solar radiation      | Solar radiation
@@ -60,7 +66,13 @@ Your PWS needs to be connected to your router by WS View (and probably also the 
 | Temperature (indoor) | Temperature
 | THB                  | Temperature, humidity and barometer (pressure and prediction)
 | UVI                  | UV index
-| UV Alert             | (calculated)
+| UV Alert             | UV index + warning level (calculated)
 | Wind                 | Wind direction, speed and gust
 | Wind                 | Wind direction, speed, gust, temperature and gust
 | Wind Speed           | Wind speed
+
+## Protocols
+WS View supports 2 protocols for `Customized` upload: `Wunderground` or `Ecowitt`. My information about the data to be uploaded is based on my own experience and information from:
+
+Wunderground: https://feedback.weather.com/customer/en/portal/articles/2924682-pws-upload-protocol?b_id=17298
+Ecowitt: not found yet
