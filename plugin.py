@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Personal Weather Station 
+# Personal Weather Station
 #
 # Author: Xorfor
 #
 """
 <plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.0" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
     <params>
-        <param field="Port" label="Port" width="30px" required="true" default="5000"/>
+        <param field="Address" label="Port" width="40px" required="true" default="5000"/>
         <param field="Mode6" label="Debug" width="100px">
             <options>
                 <option label="True" value="Debug"/>
@@ -44,6 +44,8 @@ class BasePlugin:
     __UNIT_WND3 = 12
     __UNIT_GUST = 13
     __UNIT_SWTP = 20
+    __UNIT_BARR = 21
+    __UNIT_BARA = 22
 
     __UNITS = [
         # id, name, type, subtype, options, used
@@ -64,6 +66,8 @@ class BasePlugin:
         [__UNIT_WND3, "Wind speed", 243, 31, {"Custom": "0;m/s"}, __USED],
         [__UNIT_GUST, "Gust", 243, 31, {"Custom": "0;m/s"}, __USED],
         [__UNIT_SWTP, "Station", 243, 19, {}, __USED],
+        [__UNIT_BARR, "Barometer (relative)", 243, 26, {}, __USED],
+        [__UNIT_BARA, "Barometer (absolute)", 243, 26, {}, __USED],
     ]
 
     def __init__(self):
@@ -72,7 +76,7 @@ class BasePlugin:
         self.httpServerConns = {}
 
     def onConnect(self, Connection, Status, Description):
-        Domoticz.Log("onConnect {}={}:{} {}-{}".format(
+        Domoticz.Debug("onConnect {}={}:{} {}-{}".format(
             Connection.Name,
             Connection.Address,
             Connection.Port,
@@ -80,22 +84,22 @@ class BasePlugin:
             Description
         )
         )
-        Domoticz.Log(str(Connection))
+        Domoticz.Debug(str(Connection))
         self.httpServerConns[Connection.Name] = Connection
 
     def onDisconnect(self, Connection):
-        Domoticz.Log("onDisconnect {}".format(Connection.Name))
-        # Domoticz.Log("Server Connections:")
+        Domoticz.Debug("onDisconnect {}".format(Connection.Name))
+        # Domoticz.Debug("Server Connections:")
         # for x in self.httpServerConns:
-        #     Domoticz.Log("--> "+str(x)+"'.")
+        #     Domoticz.Debug("--> "+str(x)+"'.")
         if Connection.Name in self.httpServerConns:
             del self.httpServerConns[Connection.Name]
 
     def onHeartbeat(self):
-        Domoticz.Log("onHeartbeat")
+        Domoticz.Debug("onHeartbeat")
 
     def onMessage(self, Connection, Data):
-        Domoticz.Log("onMessage {}={}:{} {}".format(
+        Domoticz.Debug("onMessage {}={}:{} {}".format(
             Connection.Name,
             Connection.Address,
             Connection.Port,
@@ -108,14 +112,14 @@ class BasePlugin:
         if "Verb" in Data:
             strVerb = Data["Verb"]
             strURL = Data["URL"]
-            Domoticz.Log("Request {}".format(strVerb))
+            Domoticz.Debug("Request {}".format(strVerb))
             if strVerb == "GET" and strURL.split("?")[0] == "/weatherstation/updateweatherstation.php":
                 protocol = "Wunderground"
                 strData = strURL.split("?")[1]
-                Domoticz.Log("strData: {}".format(strData))
+                Domoticz.Debug("strData: {}".format(strData))
                 # Convert URL parameters to dict for generic update of the devices
                 data = dict(item.split("=") for item in strData.split("&"))
-                Domoticz.Log("data: {}".format(data))
+                Domoticz.Debug("data: {}".format(data))
                 if len(data) > 0:
                     dataIsValid = True
                     # Get data
@@ -139,7 +143,10 @@ class BasePlugin:
                     solarradiation = float(data.get("solarradiation"))
                     uv = int(data.get("UV"))
                     softwaretype = data.get("softwaretype")
-                    pressure = pressure_inches2iso(float(data.get("baromin")))
+                    pressure = round(pressure_inches2iso(
+                        float(data.get("baromin"))))
+                    pressureabs = round(pressure_inches2iso(
+                        float(data.get("absbaromin"))))
                     preciprate = round(distance_inch2iso(
                         float(data.get("rainin"))), 2)
                     preciptotal = round(distance_inch2iso(
@@ -147,10 +154,10 @@ class BasePlugin:
 
             elif strVerb == "POST" and strURL == "/data/report/":
                 protocol = "Ecowitt"
-                Domoticz.Log("Ecowitt protocol")
+                Domoticz.Debug("Ecowitt protocol")
                 strData = Data["Data"].decode("utf-8")
                 data = dict(item.split("=") for item in strData.split("&"))
-                Domoticz.Log("data: {}".format(data))
+                Domoticz.Debug("data: {}".format(data))
                 if len(data) > 0:
                     dataIsValid = True
                     # Get data
@@ -167,8 +174,10 @@ class BasePlugin:
                     windgust = round(speed_mph2iso(
                         float(data.get("windgustmph"))), 1)
                     winddir = int(data.get("winddir"))
-                    pressure = pressure_inches2iso(
-                        float(data.get("baromrelin")))
+                    pressure = round(pressure_inches2iso(
+                        float(data.get("baromrelin"))))
+                    pressureabs = round(pressure_inches2iso(
+                        float(data.get("baromabsin"))))
                     preciprate = round(distance_inch2iso(
                         float(data.get("rainratein"))), 2)
                     preciptotal = round(distance_inch2iso(
@@ -186,7 +195,7 @@ class BasePlugin:
                 Domoticz.Error("Unknown protocol")
                 dataIsValid = False
             if dataIsValid:
-                Domoticz.Log("Protocol: {}".format(protocol))
+                Domoticz.Debug("Protocol: {}".format(protocol))
                 # Update devices
                 UpdateDevice(self.__UNIT_TMP1,
                              0,
@@ -229,7 +238,7 @@ class BasePlugin:
                              )
                 # Custom device, so we have to handle the alternative windspeed units
                 windunit = int(Settings["WindUnit"])
-                Domoticz.Log("WindUnit: {}".format(windunit))
+                Domoticz.Debug("WindUnit: {}".format(windunit))
                 UpdateDeviceOptions(
                     self.__UNIT_WND3, Options=speed2options(windunit))
                 UpdateDevice(self.__UNIT_WND3,
@@ -269,6 +278,16 @@ class BasePlugin:
                              "{};{};{};{};{}".format(
                                  temp, humidity, humiditystatus, pressure, pressure2status(pressure))
                              )
+                UpdateDevice(self.__UNIT_BARR,
+                             0,
+                             "{};{}".format(
+                                 pressure, pressure2status(pressure))
+                             )
+                UpdateDevice(self.__UNIT_BARA,
+                             0,
+                             "{};{}".format(
+                                 pressureabs, pressure2status(pressureabs))
+                             )
                 UpdateDevice(self.__UNIT_RAIN,
                              0,
                              "{};{}".format(preciprate*100, preciptotal)
@@ -296,10 +315,10 @@ class BasePlugin:
             Name="Server",
             Transport="TCP/IP",
             Protocol="HTTP",
-            Port=Parameters["Port"]
+            Port=Parameters["Address"]
         )
         self.httpServerConn.Listen()
-        Domoticz.Log("Leaving on start")
+        Domoticz.Log("Listening to port: {}".format(Parameters["Address"]))
 
 
 global _plugin
@@ -333,17 +352,6 @@ def onHeartbeat():
 # Generic helper functions
 
 
-def LogMessage(Message):
-    if Parameters["Mode6"] != "Normal":
-        Domoticz.Log(Message)
-    elif Parameters["Mode6"] != "Debug":
-        Domoticz.Debug(Message)
-    else:
-        f = open("http.html", "w")
-        f.write(Message)
-        f.close()
-
-
 def DumpConfigToLog():
     for x in Parameters:
         if Parameters[x] != "":
@@ -361,15 +369,15 @@ def DumpConfigToLog():
 
 def DumpHTTPResponseToLog(httpDict):
     if isinstance(httpDict, dict):
-        Domoticz.Log("!!! HTTP Details ("+str(len(httpDict))+"):")
+        Domoticz.Debug("HTTP Details ({}):".format(len(httpDict)))
         for x in httpDict:
             if isinstance(httpDict[x], dict):
-                Domoticz.Log("!!! --->'"+x+" ("+str(len(httpDict[x]))+"):")
+                Domoticz.Debug("    '{}' ({}):".format(x, len(httpDict[x])))
                 for y in httpDict[x]:
-                    Domoticz.Log("!!! ------->'" + y + "':'" +
-                                 str(httpDict[x][y]) + "'")
+                    Domoticz.Debug(
+                        "        '{}': '{}'".format(y, httpDict[x][y]))
             else:
-                Domoticz.Log("!!! --->'" + x + "':'" + str(httpDict[x]) + "'")
+                Domoticz.Debug("    '{}: '{}'".format(x, httpDict[x]))
 
 
 def UpdateDevice(Unit, nValue, sValue, TimedOut=0, AlwaysUpdate=False):
@@ -447,6 +455,7 @@ BARO_FORECAST_SUNNY = 1
 BARO_FORECAST_PARTLYCLOUDY = 2
 BARO_FORECAST_CLOUDY = 3
 BARO_FORECAST_RAIN = 4
+BARO_FORECAST_UNKNOWN = 5
 BARO_FORECASTS = {BARO_FORECAST_NOINFO,
                   BARO_FORECAST_SUNNY,
                   BARO_FORECAST_PARTLYCLOUDY,
@@ -559,11 +568,11 @@ def speed2unit(speed, unit):
         if unit == WIND_SPEED_ISO:
             return speed
         elif unit == WIND_SPEED_KMH:
-            return round(speed * 3.60000000,1 )
+            return round(speed * 3.60000000, 1)
         elif unit == WIND_SPEED_MPH:
-            return round(speed * 2.23693629,1)
+            return round(speed * 2.23693629, 1)
         elif unit == WIND_SPEED_KNOTS:
-            return round(speed * 1.94384449,1)
+            return round(speed * 1.94384449, 1)
         elif unit == WIND_SPEED_BEAUFORT:
             if 0 <= speed < 0.3:
                 return 0

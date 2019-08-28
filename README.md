@@ -1,5 +1,5 @@
 # Domoticz PWS Plugin
-This Domoticz Plugin allows you to get the data directly from your own personal weather station (PWS). This plugin does NOT require that you register your PWS to WeatherUnderground, Ecowitt, WeatherCloud, etc. This plugin will directly capture the data!
+This Domoticz Plugin allows you to get the data directly from your own personal weather station (PWS). This plugin does NOT require that you register your PWS to WeatherUnderground, Ecowitt, WeatherCloud, etc, or use Weewx. This plugin will directly capture the data!
 
 ## Prerequisites
 Your PWS needs to be connected to your router by WS View (and probably also the older 'WS Tool'). With this application you can connect your PWS to the router, so that your PWS can upload weather data.
@@ -51,7 +51,7 @@ If new devices are added in the plugin, you have to remove the hardware and add 
 ## Parameters
 | Name                 | Description
 | :---                 | :---
-| Port                 | Port number as choosen in WS View, eg. 5000
+| Port                 | Port number as choosen in WS View, eg. 5000 (displayed on Hardware overview as Address)
 
 ## Devices
 ![Devices](/images/screendump.jpg)
@@ -60,13 +60,13 @@ I have created as much devices as possible, so you can select your own favourite
 
 | Name                 | Description
 | :---                 | :---
+| Barometer (absolute) | Pressure (absolute) in hPa
+| Barometer (relative) | Pressure (relative) in hPa
 | Chill                | Chill (calculated when `Ecowitt` protocol is used)
 | Dew point            | Dew point (calculated when `Ecowitt` protocol is used)
 | Gust                 | Gust
 | Humidity             | Humidity
 | Humidity (indoor)    | Humidity (indoor)
-| Pressure (absolute)  | Pressure (absolute) in hPa (not implemented yet)
-| Pressure (relative)  | Pressure (relative) in hPa (not implemented yet)
 | Rain                 | Current rain rate and daily total
 | Station              | Format: [ip adress] ([software]): [Protocol] (`Wunderground` or `Ecowitt`), from your PWS.
 | Solar radiation      | Solar radiation
