@@ -1,5 +1,5 @@
 # Domoticz PWS Plugin
-This Domoticz Plugin allows you to get the data directly from your own personal weather station (PWS). This plugin does NOT require that you register your PWS to WeatherUnderground, Ecowitt, WeatherCloud, etc, or use Weewx. This plugin will directly capture the data!
+This Domoticz Plugin allows you to get the data directly from your own personal weather station (PWS). This plugin does NOT require that you register your PWS to WeatherUnderground, Ecowitt, WeatherCloud, etc, or use of WeeWX. This plugin will directly capture the data from your weather station!
 
 ## Prerequisites
 Your PWS needs to be connected to your router by WS View (and probably also the older 'WS Tool'). With this application you can connect your PWS to the router, so that your PWS can upload weather data.
@@ -60,30 +60,49 @@ If new devices are added in the plugin, you have to remove the hardware and add 
 
 I have created as much devices as possible, so you can select your own favourites.
 
-| Name                 | Description
-| :---                 | :---
-| Barometer (absolute) | Pressure (absolute) in hPa
-| Barometer (relative) | Pressure (relative) in hPa
-| Chill                | Chill (calculated when `Ecowitt` protocol is used)
-| Dew point            | Dew point (calculated when `Ecowitt` protocol is used)
-| Gust                 | Gust
-| Humidity             | Humidity
-| Humidity (indoor)    | Humidity (indoor)
-| Rain                 | Current rain rate and daily total
-| Station              | Format: [ip adress] ([software]): [Protocol] (`Wunderground` or `Ecowitt`), from your PWS.
-| Solar radiation      | Solar radiation
-| Temp + Hum           | Temperature and humidity
-| Temperature          | Temperature
-| Temperature (indoor) | Temperature
-| THB                  | Temperature, humidity and barometer (pressure and prediction)
-| UVI                  | UV index
-| UV Alert             | UV index + warning level (calculated)
-| Wind                 | Wind direction, speed and gust
-| Wind                 | Wind direction, speed, gust, temperature and gust
-| Wind Speed           | Wind speed
+| Name                  | Description
+| :---                  | :---
+| Barometer (absolute)  | Pressure (absolute) in hPa
+| Barometer (relative)  | Pressure (relative) in hPa
+| Chill                 | Chill (calculated when `Ecowitt` protocol is used)
+| Dew point             | Dew point (calculated when `Ecowitt` protocol is used)
+| Gust                  | Gust
+| Humidity              | Humidity
+| Humidity (indoor)     | Humidity (indoor)
+| Rain                  | Current rain rate and daily total
+| Station               | Format: [ip adress] ([software]): [Protocol] (`Wunderground` or `Ecowitt`), from your PWS.
+| Solar radiation       | Solar radiation
+| Temp + Hum            | Temperature and humidity
+| Temperature           | Temperature
+| Temperature (indoor)  | Temperature
+| THB                   | Temperature, humidity and barometer (pressure and prediction)
+| UVI                   | UV index
+| UV Alert              | UV index + warning level (calculated)
+| Wind                  | Wind direction, speed and gust
+| Wind                  | Wind direction, speed, gust, temperature and gust
+| Wind Speed            | Wind speed
 
 ## Protocols
 WS View supports 2 protocols for `Customized` upload: `Wunderground` or `Ecowitt`. My information about the data to be uploaded is based on my own experience and information from:
 
-Wunderground: https://feedback.weather.com/customer/en/portal/articles/2924682-pws-upload-protocol?b_id=17298
-Ecowitt: not found yet
+### Wunderground
+Information can be found at: https://feedback.weather.com/customer/en/portal/articles/2924682-pws-upload-protocol?b_id=17298.
+
+#### Not supported (yet)
+| Name                  |
+| :---                  |
+| weather               |
+| soiltempf             |
+| soilmoisture          |
+| leafwetness           |
+| visibility            |
+| Aq* (like AqNO, AqBC )|
+
+### Ecowitt
+Information not found yet.
+
+## Supported devices
+In general, if the station is supplied with 'EasyWeather' software, it is likely that the station will work with this Domoticz plugin!
+
+### Ventus 
+Ventus W830
