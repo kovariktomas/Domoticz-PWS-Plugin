@@ -148,9 +148,9 @@ class BasePlugin:
                     pressureabs = round(pressure_inches2iso(
                         float(data.get("absbaromin"))))
                     preciprate = round(distance_inch2iso(
-                        float(data.get("rainin"))), 2)
+                        float(data.get("rainin"))) * 10 , 2)
                     preciptotal = round(distance_inch2iso(
-                        float(data.get("dailyrainin"))), 1)
+                        float(data.get("dailyrainin"))) * 10, 1)
 
             elif strVerb == "POST" and strURL == "/data/report/":
                 protocol = "Ecowitt"
@@ -179,9 +179,9 @@ class BasePlugin:
                     pressureabs = round(pressure_inches2iso(
                         float(data.get("baromabsin"))))
                     preciprate = round(distance_inch2iso(
-                        float(data.get("rainratein"))), 2)
+                        float(data.get("rainratein"))) * 10, 2)
                     preciptotal = round(distance_inch2iso(
-                        float(data.get("dailyrainin"))), 1)
+                        float(data.get("dailyrainin"))) * 10, 1)
                     softwaretype = data.get("stationtype")
                     solarradiation = float(data.get("solarradiation"))
                     uv = int(data.get("uv"))
