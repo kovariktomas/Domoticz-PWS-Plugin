@@ -148,7 +148,7 @@ class BasePlugin:
                     pressureabs = round(pressure_inches2iso(
                         float(data.get("absbaromin"))))
                     preciprate = round(distance_inch2iso(
-                        float(data.get("rainin"))) * 10 , 2)
+                        float(data.get("rainin"))) * 10, 2)
                     preciptotal = round(distance_inch2iso(
                         float(data.get("dailyrainin"))) * 10, 1)
 
@@ -290,7 +290,7 @@ class BasePlugin:
                              )
                 UpdateDevice(self.__UNIT_RAIN,
                              0,
-                             "{};{}".format(preciprate*100, preciptotal)
+                             "{};{}".format(preciprate * 100, preciptotal), AlwaysUpdate=True
                              )
 
     def onStart(self):
