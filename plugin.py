@@ -40,6 +40,7 @@ class BasePlugin:
     __UNIT_UVAT = 16
     __UNIT_DEWP = 9
     __UNIT_WND2 = 10
+    __UNIT_WND4 = 17
     __UNIT_CHLL = 11
     __UNIT_WND3 = 12
     __UNIT_GUST = 13
@@ -64,6 +65,7 @@ class BasePlugin:
         [__UNIT_UVAT, "UV Alert", 243, 22, {}, __USED],
         [__UNIT_SOLR, "Solar radiation", 243, 2, {}, __USED],
         [__UNIT_WND3, "Wind speed", 243, 31, {"Custom": "0;m/s"}, __USED],
+        [__UNIT_WND4, "Wind direction", 243, 31, {"Custom": "0;°"}, __USED],
         [__UNIT_GUST, "Gust", 243, 31, {"Custom": "0;m/s"}, __USED],
         [__UNIT_SWTP, "Station", 243, 19, {}, __USED],
         [__UNIT_BARR, "Barometer (relative)", 243, 26, {}, __USED],
@@ -255,6 +257,10 @@ class BasePlugin:
                 UpdateDevice(self.__UNIT_GUST,
                              0,
                              "{}".format(windgust),
+                             )
+                UpdateDevice(self.__UNIT_WND4,
+                             0,
+                             "{}".format(winddir),
                              )
                 UpdateDevice(self.__UNIT_SOLR,
                              int(solarradiation),
