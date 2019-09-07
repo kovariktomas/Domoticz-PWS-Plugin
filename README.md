@@ -85,6 +85,7 @@ I have created as much devices as possible, so you can select your own favourite
 | UV Alert              | UV index + warning level (calculated)
 | Wind                  | Wind direction, speed and gust
 | Wind                  | Wind direction, speed, gust, temperature and gust
+| Wind direction        | Wind direction
 | Wind Speed            | Wind speed
 
 ## Protocols
