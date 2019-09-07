@@ -22,7 +22,10 @@ Your PWS needs to be connected to your router by WS View (and probably also the 
 
 ![Screenshot](/images/screendump2.png)
 
-Now your PWS will start to upload its data to your Domoticz server at the specified port. Now we need to install the Domoticz plugin to created the required devices, listen to the specified port, retrieve the data and update the devices with the latest information.
+Now your PWS will start to upload its data to your Domoticz server at the specified port. 
+
+Next step is to install the Domoticz plugin. This plugin will automatically create the required devices, listen to the specified port, retrieve the data and update the devices with the latest information.
+
 Unfortunately you can connect your PWS only to one Domoticz server!
 
 ## Installation
@@ -55,7 +58,7 @@ If new devices are added in the plugin, you have to remove the hardware and add 
 ## Parameters
 | Name                 | Description
 | :---                 | :---
-| Port                 | Port number as choosen in WS View, eg. 5000 (displayed on Hardware overview as Address)
+| **Port**             | Port number as choosen in WS View, eg. 5000 (displayed on Hardware overview as Address)
 
 ## Devices
 ![Devices](/images/screendump.jpg)
