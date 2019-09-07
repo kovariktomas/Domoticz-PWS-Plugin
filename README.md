@@ -20,6 +20,8 @@ Your PWS needs to be connected to your router by WS View (and probably also the 
 1. `Upload Interval`, leave it `60` seconds
 1. Click on `Save`
 
+![Screenshot](/images/screendump2.png)
+
 Now your PWS will start to upload its data to your Domoticz server at the specified port. Now we need to install the Domoticz plugin to created the required devices, listen to the specified port, retrieve the data and update the devices with the latest information.
 Unfortunately you can connect your PWS only to one Domoticz server!
 
