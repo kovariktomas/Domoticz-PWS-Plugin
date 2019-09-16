@@ -6,7 +6,7 @@
 # Author: Xorfor
 #
 """
-<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.2" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
+<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.4" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
     <params>
         <param field="Address" label="Port" width="40px" required="true" default="5000"/>
         <param field="Mode6" label="Debug" width="100px">
@@ -26,7 +26,7 @@ class BasePlugin:
     __UNUSED = 0
     __USED = 1
     #
-# Devices
+    # Devices
     __UNIT_TMP1 = 1
     __UNIT_TMP2 = 14
     __UNIT_THB1 = 2
@@ -78,22 +78,20 @@ class BasePlugin:
         self.httpServerConns = {}
 
     def onConnect(self, Connection, Status, Description):
-        Domoticz.Debug("onConnect {}={}:{} {}-{}".format(
-            Connection.Name,
-            Connection.Address,
-            Connection.Port,
-            Status,
-            Description
-        )
+        Domoticz.Debug(
+            "onConnect {}={}:{} {}-{}".format(
+                Connection.Name,
+                Connection.Address,
+                Connection.Port,
+                Status,
+                Description,
+            )
         )
         Domoticz.Debug(str(Connection))
         self.httpServerConns[Connection.Name] = Connection
 
     def onDisconnect(self, Connection):
         Domoticz.Debug("onDisconnect {}".format(Connection.Name))
-        # Domoticz.Debug("Server Connections:")
-        # for x in self.httpServerConns:
-        #     Domoticz.Debug("--> "+str(x)+"'.")
         if Connection.Name in self.httpServerConns:
             del self.httpServerConns[Connection.Name]
 
@@ -101,12 +99,10 @@ class BasePlugin:
         Domoticz.Debug("onHeartbeat")
 
     def onMessage(self, Connection, Data):
-        Domoticz.Debug("onMessage {}={}:{} {}".format(
-            Connection.Name,
-            Connection.Address,
-            Connection.Port,
-            Data,
-        )
+        Domoticz.Debug(
+            "onMessage {}={}:{} {}".format(
+                Connection.Name, Connection.Address, Connection.Port, Data
+            )
         )
         DumpHTTPResponseToLog(Data)
         dataIsValid = False
@@ -115,7 +111,10 @@ class BasePlugin:
             strVerb = Data["Verb"]
             strURL = Data["URL"]
             Domoticz.Debug("Request {}".format(strVerb))
-            if strVerb == "GET" and strURL.split("?")[0] == "/weatherstation/updateweatherstation.php":
+            if (
+                strVerb == "GET"
+                and strURL.split("?")[0] == "/weatherstation/updateweatherstation.php"
+            ):
                 protocol = "Wunderground"
                 strData = strURL.split("?")[1]
                 Domoticz.Debug("strData: {}".format(strData))
@@ -129,31 +128,30 @@ class BasePlugin:
                     humiditystatus = humidity2status(humidity)
                     indoorhumidity = int(data.get("indoorhumidity"))
                     indoorhumiditystatus = humidity2status(indoorhumidity)
-                    temp = round(temperature_f2iso(
-                        float(data.get("tempf"))), 1)
-                    indoortemp = round(temperature_f2iso(
-                        float(data.get("indoortempf"))), 1)
-                    dewpt = round(temperature_f2iso(
-                        float(data.get("dewptf"))), 1)
-                    windchill = round(temperature_f2iso(
-                        float(data.get("windchillf"))), 1)
-                    windspeed = round(speed_mph2iso(
-                        float(data.get("windspeedmph"))), 1)
-                    windgust = round(speed_mph2iso(
-                        float(data.get("windgustmph"))), 1)
+                    temp = round(temperature_f2iso(float(data.get("tempf"))), 1)
+                    indoortemp = round(
+                        temperature_f2iso(float(data.get("indoortempf"))), 1
+                    )
+                    dewpt = round(temperature_f2iso(float(data.get("dewptf"))), 1)
+                    windchill = round(
+                        temperature_f2iso(float(data.get("windchillf"))), 1
+                    )
+                    windspeed = round(speed_mph2iso(float(data.get("windspeedmph"))), 1)
+                    windgust = round(speed_mph2iso(float(data.get("windgustmph"))), 1)
                     winddir = int(data.get("winddir"))
                     solarradiation = float(data.get("solarradiation"))
                     uv = int(data.get("UV"))
                     softwaretype = data.get("softwaretype")
-                    pressure = round(pressure_inches2iso(
-                        float(data.get("baromin"))))
-                    pressureabs = round(pressure_inches2iso(
-                        float(data.get("absbaromin"))))
-                    preciprate = round(distance_inch2iso(
-                        float(data.get("rainin"))) * 10, 2)
-                    preciptotal = round(distance_inch2iso(
-                        float(data.get("dailyrainin"))) * 10, 1)
-
+                    pressure = round(pressure_inches2iso(float(data.get("baromin"))))
+                    pressureabs = round(
+                        pressure_inches2iso(float(data.get("absbaromin")))
+                    )
+                    preciprate = round(
+                        distance_inch2iso(float(data.get("rainin"))) * 10, 2
+                    )
+                    preciptotal = round(
+                        distance_inch2iso(float(data.get("dailyrainin"))) * 10, 1
+                    )
             elif strVerb == "POST" and strURL == "/data/report/":
                 protocol = "Ecowitt"
                 Domoticz.Debug("Ecowitt protocol")
@@ -167,137 +165,129 @@ class BasePlugin:
                     humiditystatus = humidity2status(humidity)
                     indoorhumidity = int(data.get("humidityin"))
                     indoorhumiditystatus = humidity2status(indoorhumidity)
-                    temp = round(temperature_f2iso(
-                        float(data.get("tempf"))), 1)
-                    indoortemp = round(temperature_f2iso(
-                        float(data.get("tempinf"))), 1)
-                    windspeed = round(speed_mph2iso(
-                        float(data.get("windspeedmph"))), 1)
-                    windgust = round(speed_mph2iso(
-                        float(data.get("windgustmph"))), 1)
+                    temp = round(temperature_f2iso(float(data.get("tempf"))), 1)
+                    indoortemp = round(temperature_f2iso(float(data.get("tempinf"))), 1)
+                    windspeed = round(speed_mph2iso(float(data.get("windspeedmph"))), 1)
+                    windgust = round(speed_mph2iso(float(data.get("windgustmph"))), 1)
                     winddir = int(data.get("winddir"))
-                    pressure = round(pressure_inches2iso(
-                        float(data.get("baromrelin"))))
-                    pressureabs = round(pressure_inches2iso(
-                        float(data.get("baromabsin"))))
-                    preciprate = round(distance_inch2iso(
-                        float(data.get("rainratein"))) * 10, 2)
-                    preciptotal = round(distance_inch2iso(
-                        float(data.get("dailyrainin"))) * 10, 1)
+                    pressure = round(pressure_inches2iso(float(data.get("baromrelin"))))
+                    pressureabs = round(
+                        pressure_inches2iso(float(data.get("baromabsin")))
+                    )
+                    preciprate = round(
+                        distance_inch2iso(float(data.get("rainratein"))) * 10, 2
+                    )
+                    preciptotal = round(
+                        distance_inch2iso(float(data.get("dailyrainin"))) * 10, 1
+                    )
                     softwaretype = data.get("stationtype")
                     solarradiation = float(data.get("solarradiation"))
                     uv = int(data.get("uv"))
                     # dewpt not reported in Ecowitt
-                    dewpt = dew_point(temp, humidity) if data.get("dewptf") is None else round(
-                        temperature_f2iso(float(data.get("dewptf"))), 1)
+                    dewpt = (
+                        dew_point(temp, humidity)
+                        if data.get("dewptf") is None
+                        else round(temperature_f2iso(float(data.get("dewptf"))), 1)
+                    )
                     # windchill not reported in Ecowitt
-                    windchill = wind_chill(temp, windspeed) if data.get("windchillf") is None else round(
-                        temperature_f2iso(float(data.get("windchillf"))), 1)
+                    windchill = (
+                        wind_chill(temp, windspeed)
+                        if data.get("windchillf") is None
+                        else round(temperature_f2iso(float(data.get("windchillf"))), 1)
+                    )
             else:
                 Domoticz.Error("Unknown protocol")
                 dataIsValid = False
+            #
             if dataIsValid:
                 Domoticz.Debug("Protocol: {}".format(protocol))
                 # Update devices
-                UpdateDevice(self.__UNIT_TMP1,
-                             0,
-                             "{}".format(indoortemp),
-                             )
-                UpdateDevice(self.__UNIT_TMP2,
-                             0,
-                             "{}".format(temp),
-                             )
-                UpdateDevice(self.__UNIT_HUM1,
-                             int(humidity),
-                             humiditystatus,
-                             )
-                UpdateDevice(self.__UNIT_HUM2,
-                             int(indoorhumidity),
-                             indoorhumiditystatus,
-                             )
-                UpdateDevice(self.__UNIT_DEWP,
-                             0,
-                             "{}".format(dewpt),
-                             )
-                UpdateDevice(self.__UNIT_CHLL,
-                             0,
-                             "{}".format(windchill),
-                             )
-                UpdateDevice(self.__UNIT_TPHM,
-                             0,
-                             "{};{};{}".format(
-                                 temp, humidity, humiditystatus),
-                             )
-                UpdateDevice(self.__UNIT_WND1,
-                             0,
-                             "{};{};{};{};{};{}".format(
-                                 winddir, bearing2status(winddir), windspeed*10, windgust*10, temp, windchill)
-                             )
-                UpdateDevice(self.__UNIT_WND2,
-                             0,
-                             "{};{};{};{};{};{}".format(
-                                 winddir, bearing2status(winddir), windspeed*10, windgust*10, temp, windchill)
-                             )
+                UpdateDevice(self.__UNIT_TMP1, 0, "{}".format(indoortemp))
+                UpdateDevice(self.__UNIT_TMP2, 0, "{}".format(temp))
+                UpdateDevice(self.__UNIT_HUM1, int(humidity), humiditystatus)
+                UpdateDevice(
+                    self.__UNIT_HUM2, int(indoorhumidity), indoorhumiditystatus
+                )
+                UpdateDevice(self.__UNIT_DEWP, 0, "{}".format(dewpt))
+                UpdateDevice(self.__UNIT_CHLL, 0, "{}".format(windchill))
+                UpdateDevice(
+                    self.__UNIT_TPHM,
+                    0,
+                    "{};{};{}".format(temp, humidity, humiditystatus),
+                )
+                UpdateDevice(
+                    self.__UNIT_WND1,
+                    0,
+                    "{};{};{};{};{};{}".format(
+                        winddir,
+                        bearing2status(winddir),
+                        windspeed * 10,
+                        windgust * 10,
+                        temp,
+                        windchill,
+                    ),
+                )
+                UpdateDevice(
+                    self.__UNIT_WND2,
+                    0,
+                    "{};{};{};{};{};{}".format(
+                        winddir,
+                        bearing2status(winddir),
+                        windspeed * 10,
+                        windgust * 10,
+                        temp,
+                        windchill,
+                    ),
+                )
                 # Custom device, so we have to handle the alternative windspeed units
                 windunit = int(Settings["WindUnit"])
                 Domoticz.Debug("WindUnit: {}".format(windunit))
-                UpdateDeviceOptions(
-                    self.__UNIT_WND3, Options=speed2options(windunit))
-                UpdateDevice(self.__UNIT_WND3,
-                             0,
-                             "{}".format(speed2unit(windspeed, windunit)),
-                             )
+                UpdateDeviceOptions(self.__UNIT_WND3, Options=speed2options(windunit))
+                UpdateDevice(
+                    self.__UNIT_WND3, 0, "{}".format(speed2unit(windspeed, windunit))
+                )
                 # Custom device, so we have to handle the alternative windspeed units
-                UpdateDeviceOptions(
-                    self.__UNIT_GUST, Options=speed2options(windunit))
-                UpdateDevice(self.__UNIT_GUST,
-                             0,
-                             "{}".format(speed2unit(windgust, windunit))
-                             )
-                UpdateDevice(self.__UNIT_GUST,
-                             0,
-                             "{}".format(windgust),
-                             )
-                UpdateDevice(self.__UNIT_WND4,
-                             0,
-                             "{}".format(winddir),
-                             )
-                UpdateDevice(self.__UNIT_SOLR,
-                             int(solarradiation),
-                             str(solarradiation),
-                             )
-                UpdateDevice(self.__UNIT_UVID,
-                             int(uv),
-                             "{};{}".format(uv, temp),
-                             )
-                UpdateDevice(self.__UNIT_UVAT,
-                             uv2status(uv),
-                             str(uv) + " UVI",
-                             )
-                UpdateDevice(self.__UNIT_SWTP,
-                             0,
-                             "{} ({}): {}".format(
-                                 Connection.Address, softwaretype, protocol),
-                             )
-                UpdateDevice(self.__UNIT_THB1,
-                             0,
-                             "{};{};{};{};{}".format(
-                                 temp, humidity, humiditystatus, pressure, pressure2status(pressure))
-                             )
-                UpdateDevice(self.__UNIT_BARR,
-                             0,
-                             "{};{}".format(
-                                 pressure, pressure2status(pressure))
-                             )
-                UpdateDevice(self.__UNIT_BARA,
-                             0,
-                             "{};{}".format(
-                                 pressureabs, pressure2status(pressureabs))
-                             )
-                UpdateDevice(self.__UNIT_RAIN,
-                             0,
-                             "{};{}".format(preciprate * 100, preciptotal), AlwaysUpdate=True
-                             )
+                UpdateDeviceOptions(self.__UNIT_GUST, Options=speed2options(windunit))
+                UpdateDevice(
+                    self.__UNIT_GUST, 0, "{}".format(speed2unit(windgust, windunit))
+                )
+                UpdateDevice(self.__UNIT_GUST, 0, "{}".format(windgust))
+                UpdateDevice(self.__UNIT_WND4, 0, "{}".format(winddir))
+                UpdateDevice(self.__UNIT_SOLR, int(solarradiation), str(solarradiation))
+                UpdateDevice(self.__UNIT_UVID, int(uv), "{};{}".format(uv, temp))
+                UpdateDevice(self.__UNIT_UVAT, uv2status(uv), str(uv) + " UVI")
+                UpdateDevice(
+                    self.__UNIT_SWTP,
+                    0,
+                    "{} ({}): {}".format(Connection.Address, softwaretype, protocol),
+                )
+                UpdateDevice(
+                    self.__UNIT_THB1,
+                    0,
+                    "{};{};{};{};{}".format(
+                        temp,
+                        humidity,
+                        humiditystatus,
+                        pressure,
+                        pressure2status(pressure),
+                    ),
+                )
+                UpdateDevice(
+                    self.__UNIT_BARR,
+                    0,
+                    "{};{}".format(pressure, pressure2status(pressure)),
+                )
+                UpdateDevice(
+                    self.__UNIT_BARA,
+                    0,
+                    "{};{}".format(pressureabs, pressure2status(pressureabs)),
+                )
+                UpdateDevice(
+                    self.__UNIT_RAIN,
+                    0,
+                    "{};{}".format(preciprate * 100, preciptotal),
+                    AlwaysUpdate=True,
+                )
 
     def onStart(self):
         Domoticz.Debug("onStart")
@@ -305,23 +295,23 @@ class BasePlugin:
             Domoticz.Debugging(1)
         else:
             Domoticz.Debugging(0)
-        # DumpConfigToLog()
         # Devices
         if len(Devices) == 0:
             for unit in self.__UNITS:
-                Domoticz.Device(Unit=unit[0],
-                                Name=unit[1],
-                                Type=unit[2],
-                                Subtype=unit[3],
-                                Options=unit[4],
-                                Used=unit[5],
-                                ).Create()
+                Domoticz.Device(
+                    Unit=unit[0],
+                    Name=unit[1],
+                    Type=unit[2],
+                    Subtype=unit[3],
+                    Options=unit[4],
+                    Used=unit[5],
+                ).Create()
         # Connections
         self.httpServerConn = Domoticz.Connection(
             Name="Server",
             Transport="TCP/IP",
             Protocol="HTTP",
-            Port=Parameters["Address"]
+            Port=Parameters["Address"],
         )
         self.httpServerConn.Listen()
         Domoticz.Log("Listening to port: {}".format(Parameters["Address"]))
@@ -355,22 +345,22 @@ def onHeartbeat():
     global _plugin
     _plugin.onHeartbeat()
 
+
+################################################################################
 # Generic helper functions
-
-
+################################################################################
 def DumpConfigToLog():
     for x in Parameters:
         if Parameters[x] != "":
             Domoticz.Debug("'" + x + "':'" + str(Parameters[x]) + "'")
-    Domoticz.Debug("Device count: " + str(len(Devices)))
+    Domoticz.Debug("Device count: {}".format(len(Devices)))
     for x in Devices:
-        Domoticz.Debug("Device:           " + str(x) + " - " + str(Devices[x]))
-        Domoticz.Debug("Device ID:       '" + str(Devices[x].ID) + "'")
-        Domoticz.Debug("Device Name:     '" + Devices[x].Name + "'")
-        Domoticz.Debug("Device nValue:    " + str(Devices[x].nValue))
-        Domoticz.Debug("Device sValue:   '" + Devices[x].sValue + "'")
-        Domoticz.Debug("Device LastLevel: " + str(Devices[x].LastLevel))
-    return
+        Domoticz.Debug("Device:           {} - {}".format(x, Devices[x]))
+        Domoticz.Debug("Device ID:        {}".format(Devices[x].ID))
+        Domoticz.Debug("Device Name:     '{}'".format(Devices[x].Name))
+        Domoticz.Debug("Device nValue:    {}".format(Devices[x].nValue))
+        Domoticz.Debug("Device sValue:   '{}'".format(Devices[x].sValue))
+        Domoticz.Debug("Device LastLevel: {}".format(Devices[x].LastLevel))
 
 
 def DumpHTTPResponseToLog(httpDict):
@@ -380,8 +370,7 @@ def DumpHTTPResponseToLog(httpDict):
             if isinstance(httpDict[x], dict):
                 Domoticz.Debug("    '{}' ({}):".format(x, len(httpDict[x])))
                 for y in httpDict[x]:
-                    Domoticz.Debug(
-                        "        '{}': '{}'".format(y, httpDict[x][y]))
+                    Domoticz.Debug("        '{}': '{}'".format(y, httpDict[x][y]))
             else:
                 Domoticz.Debug("    '{}: '{}'".format(x, httpDict[x]))
 
@@ -389,20 +378,31 @@ def DumpHTTPResponseToLog(httpDict):
 def UpdateDevice(Unit, nValue, sValue, TimedOut=0, AlwaysUpdate=False):
     # Make sure that the Domoticz device still exists (they can be deleted) before updating it
     if Unit in Devices:
-        if Devices[Unit].nValue != nValue or Devices[Unit].sValue != sValue or Devices[Unit].TimedOut != TimedOut or AlwaysUpdate:
-            Devices[Unit].Update(
-                nValue=nValue, sValue=str(sValue), TimedOut=TimedOut)
+        if (
+            Devices[Unit].nValue != nValue
+            or Devices[Unit].sValue != sValue
+            or Devices[Unit].TimedOut != TimedOut
+            or AlwaysUpdate
+        ):
+            Devices[Unit].Update(nValue=nValue, sValue=str(sValue), TimedOut=TimedOut)
             Domoticz.Debug(
-                "Update {}: {} - {} - {}".format(Devices[Unit].Name, nValue, sValue, TimedOut))
+                "Update {}: {} - {} - {}".format(
+                    Devices[Unit].Name, nValue, sValue, TimedOut
+                )
+            )
 
 
 def UpdateDeviceOptions(Unit, Options={}):
     if Unit in Devices:
         if Devices[Unit].Options != Options:
-            Devices[Unit].Update(nValue=Devices[Unit].nValue,
-                                 sValue=Devices[Unit].sValue, Options=Options)
-            Domoticz.Debug("Device Options update: {}={}".format(
-                Devices[Unit].Name, Options))
+            Devices[Unit].Update(
+                nValue=Devices[Unit].nValue,
+                sValue=Devices[Unit].sValue,
+                Options=Options,
+            )
+            Domoticz.Debug(
+                "Device Options update: {}={}".format(Devices[Unit].Name, Options)
+            )
 
 
 ################################################################################
@@ -441,15 +441,31 @@ def speed_mph2iso(value):
     Returns:
         speed in m/s
     """
-    return (value * 0.44704)
+    return value * 0.44704
 
 
 def bearing2status(d):
     """
     Based on https://gist.github.com/RobertSudwarts/acf8df23a16afdb5837f
     """
-    dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
-            "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+    dirs = [
+        "N",
+        "NNE",
+        "NE",
+        "ENE",
+        "E",
+        "ESE",
+        "SE",
+        "SSE",
+        "S",
+        "SSW",
+        "SW",
+        "WSW",
+        "W",
+        "WNW",
+        "NW",
+        "NNW",
+    ]
     count = len(dirs)  # Number of entries in list
     step = 360 / count  # Wind direction is in steps of 22.5 degrees (360/16)
     ix = int((d + (step / 2)) / step)  # Calculate index in the list
@@ -462,12 +478,13 @@ BARO_FORECAST_PARTLYCLOUDY = 2
 BARO_FORECAST_CLOUDY = 3
 BARO_FORECAST_RAIN = 4
 BARO_FORECAST_UNKNOWN = 5
-BARO_FORECASTS = {BARO_FORECAST_NOINFO,
-                  BARO_FORECAST_SUNNY,
-                  BARO_FORECAST_PARTLYCLOUDY,
-                  BARO_FORECAST_CLOUDY,
-                  BARO_FORECAST_RAIN,
-                  }
+BARO_FORECASTS = {
+    BARO_FORECAST_NOINFO,
+    BARO_FORECAST_SUNNY,
+    BARO_FORECAST_PARTLYCLOUDY,
+    BARO_FORECAST_CLOUDY,
+    BARO_FORECAST_RAIN,
+}
 
 
 def pressure2status(pressure):
