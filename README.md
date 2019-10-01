@@ -4,7 +4,7 @@ This Domoticz Plugin allows you to get the data **directly** from your own perso
 **This plugin will directly capture the data from your weather station!** 
 
 ## Supported devices
-In general, if the station is supplied with `EasyWeather` software, it is likely that the station will work with this Domoticz plugin!
+In general, if the station is supplied with `EasyWeather` software (version 1.4.x), it is likely that the station will work with this Domoticz plugin!
 
 ### Tested
 
