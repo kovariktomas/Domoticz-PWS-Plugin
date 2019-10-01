@@ -112,7 +112,6 @@ class BasePlugin:
             strURL = Data["URL"]
             Domoticz.Debug("Request {}".format(strVerb))
             if strVerb == "GET":
-                # and strURL.split("?")[0] == "/weatherstation/updateweatherstation.php"
                 protocol = "Wunderground"
                 strData = strURL.split("?")[1]
                 Domoticz.Debug("strData: {}".format(strData))
@@ -151,7 +150,6 @@ class BasePlugin:
                         distance_inch2iso(float(data.get("dailyrainin"))) * 10, 1
                     )
             elif strVerb == "POST":
-                # and strURL == "/data/report/"
                 protocol = "Ecowitt"
                 Domoticz.Debug("Ecowitt protocol")
                 strData = Data["Data"].decode("utf-8")
