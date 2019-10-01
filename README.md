@@ -33,7 +33,7 @@ Your PWS needs to be connected to your router by `WS View` (and also the 'older'
 1. `Upload Interval`, leave it `60` seconds
 1. Click on `Save`
 
-![Screenshot](/images/screendump2.png)
+![Screenshot](/images/screendump2.png) ![Screenshot](/images/screendump3.png)
 
 Now your PWS will start to upload its data to your Domoticz server at the specified port. 
 
