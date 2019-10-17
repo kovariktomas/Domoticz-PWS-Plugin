@@ -5,6 +5,9 @@
 #
 # Author: Xorfor
 #
+# WU data:
+# {'weeklyrainin': '1.079', 'windspeedmph': '0.0', 'realtime': '1', 'solarradiation': '0.36', 'rtfreq': '5', 'baromin': '29.770', 'absbaromin': '29.823', 'dateutc': '2019-10-17%2016:47:39', 'tempf': '55.6', 'indoorhumidity': '67', 'windchillf': '55.6', 'UV': '0', 'softwaretype': 'EasyWeatherV1.4.4', 'PASSWORD': 'b', 'humidity': '78', 'dailyrainin': '0.169', 'action': 'updateraw', 'rainin': '0.000', 'winddir': '110', 'monthlyrainin': '7.280', 'ID': 'a', 'dewptf': '48.9', 'windgustmph': '0.0', 'indoortempf': '68.4'}
+
 """
 <plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.4" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
     <params>
@@ -19,6 +22,9 @@
 </plugin>
 """
 import Domoticz
+from datetime import datetime
+import time
+from urllib.parse import unquote
 
 
 class BasePlugin:
@@ -104,6 +110,9 @@ class BasePlugin:
                 Connection.Name, Connection.Address, Connection.Port, Data
             )
         )
+        # We need the Domoticz date time
+        dateDomoticz = datetime.now()
+        Domoticz.Debug("datenow: {}".format(dateDomoticz))
         DumpHTTPResponseToLog(Data)
         dataIsValid = False
         # Incoming Requests
@@ -143,6 +152,13 @@ class BasePlugin:
                     pressureabs = round(
                         pressure_inches2iso(float(data.get("absbaromin")))
                     )
+                    # Get the PWS date time
+                    utcdate = unquote(
+                        data.get("dateutc")
+                    )  # Remove %20 between date and time
+                    Domoticz.Debug("utcdate: {}".format(utcdate))
+                    datePWS = utc2local(datetime.strptime(utcdate, "%Y-%m-%d %H:%M:%S"))
+                    Domoticz.Debug("datelocal: {}".format(datePWS))
                     preciprate = round(
                         distance_inch2iso(float(data.get("rainin"))) * 10, 2
                     )
@@ -171,6 +187,11 @@ class BasePlugin:
                     pressureabs = round(
                         pressure_inches2iso(float(data.get("baromabsin")))
                     )
+                    # Get the PWS date time
+                    utcdate = data.get("dateutc")
+                    Domoticz.Debug("utcdate: {}".format(utcdate))
+                    datePWS = utc2local(datetime.strptime(utcdate, "%Y-%m-%d+%H:%M:%S"))
+                    Domoticz.Debug("datelocal: {}".format(datePWS))
                     preciprate = round(
                         distance_inch2iso(float(data.get("rainratein"))) * 10, 2
                     )
@@ -279,12 +300,17 @@ class BasePlugin:
                     0,
                     "{};{}".format(pressureabs, pressure2status(pressureabs)),
                 )
-                UpdateDevice(
-                    self.__UNIT_RAIN,
-                    0,
-                    "{};{}".format(preciprate * 100, preciptotal),
-                    AlwaysUpdate=True,
-                )
+                # Check Domoticz date with PWS date to keep correct 'preciptotal'
+                if datePWS.date() == dateDomoticz.date():
+                    Domoticz.Log("Rain can be updated!!!")
+                    UpdateDevice(
+                        self.__UNIT_RAIN,
+                        0,
+                        "{};{}".format(preciprate * 100, preciptotal),
+                        AlwaysUpdate=True,
+                    )
+                else:
+                    Domoticz.Log("RAIN CAN NOT BE UPDATED!!!")
 
     def onStart(self):
         Domoticz.Debug("onStart")
@@ -642,3 +668,9 @@ def speed2options(unit):
             return {}
     else:
         return {}
+
+
+def utc2local(utc):
+    epoch = time.mktime(utc.timetuple())
+    offset = datetime.fromtimestamp(epoch) - datetime.utcfromtimestamp(epoch)
+    return utc + offset
