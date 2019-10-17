@@ -123,20 +123,19 @@ Information can be found at: https://feedback.weather.com/customer/en/portal/art
 | visibility            |
 | Aq* (like AqNO, AqBC )|
 
-### Ecowitt
-Information not found yet.
-
-### Not used
+#### Not used
 The following data send by the weatherstations is not used, e.g. because this is historical data which is already maintained by Domoticz, or not relevant as sensor:
 
 | Name                |
 | :---                |
 | action              |
-| dailyrainin         |
-| dateutc             |
 | ID                  |
 | monthlyrainin       |
 | PASSWORD            |
 | realtime            |
 | rtfreq              |
 | weeklyrainin        |
+
+### Ecowitt
+Information not found yet.
+
