@@ -302,7 +302,7 @@ class BasePlugin:
                 )
                 # Check Domoticz date with PWS date to keep correct 'preciptotal'
                 if datePWS.date() == dateDomoticz.date():
-                    Domoticz.Log("Rain can be updated!!!")
+                    Domoticz.Debug("Rain can be updated!!!")
                     UpdateDevice(
                         self.__UNIT_RAIN,
                         0,
