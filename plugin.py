@@ -53,6 +53,9 @@ class BasePlugin:
     __UNIT_SWTP = 20
     __UNIT_BARR = 21
     __UNIT_BARA = 22
+    __UNIT_RIC1 = 23
+    __UNIT_RIC2 = 24
+    __UNIT_RIC3 = 25
 
     __UNITS = [
         # id, name, type, subtype, options, used
@@ -76,6 +79,9 @@ class BasePlugin:
         [__UNIT_SWTP, "Station", 243, 19, {}, __USED],
         [__UNIT_BARR, "Barometer (relative)", 243, 26, {}, __USED],
         [__UNIT_BARA, "Barometer (absolute)", 243, 26, {}, __USED],
+        # [__UNIT_RIC1, "Rain 1 (daily)", 113, 0, {}, __USED],
+        # [__UNIT_RIC2, "Rain 2 (daily)", 243, 28, {}, __USED],
+        # [__UNIT_RIC3, "Rain 3 (daily)", 243, 33, {}, __USED],
     ]
 
     def __init__(self):
@@ -110,9 +116,6 @@ class BasePlugin:
                 Connection.Name, Connection.Address, Connection.Port, Data
             )
         )
-        # We need the Domoticz date time
-        dateDomoticz = datetime.now()
-        Domoticz.Debug("datenow: {}".format(dateDomoticz))
         DumpHTTPResponseToLog(Data)
         dataIsValid = False
         # Incoming Requests
@@ -157,8 +160,12 @@ class BasePlugin:
                         data.get("dateutc")
                     )  # Remove %20 between date and time
                     Domoticz.Debug("utcdate: {}".format(utcdate))
+                    Domoticz.Debug(
+                        "datetime.strptime(utcdate, '%Y-%m-%d %H:%M:%S'): {}".format(
+                            datetime.strptime(utcdate, "%Y-%m-%d %H:%M:%S")
+                        )
+                    )
                     datePWS = utc2local(datetime.strptime(utcdate, "%Y-%m-%d %H:%M:%S"))
-                    Domoticz.Debug("datelocal: {}".format(datePWS))
                     preciprate = round(
                         distance_inch2iso(float(data.get("rainin"))) * 10, 2
                     )
@@ -191,7 +198,7 @@ class BasePlugin:
                     utcdate = data.get("dateutc")
                     Domoticz.Debug("utcdate: {}".format(utcdate))
                     datePWS = utc2local(datetime.strptime(utcdate, "%Y-%m-%d+%H:%M:%S"))
-                    Domoticz.Debug("datelocal: {}".format(datePWS))
+                    Domoticz.Debug("datePWS: {}".format(datePWS))
                     preciprate = round(
                         distance_inch2iso(float(data.get("rainratein"))) * 10, 2
                     )
@@ -300,7 +307,8 @@ class BasePlugin:
                     0,
                     "{};{}".format(pressureabs, pressure2status(pressureabs)),
                 )
-                # Check Domoticz date with PWS date to keep correct 'preciptotal'
+                # We need the Domoticz date time
+                dateDomoticz = datetime.now()
                 if datePWS.date() == dateDomoticz.date():
                     Domoticz.Debug("Rain can be updated!!!")
                     UpdateDevice(
@@ -319,8 +327,8 @@ class BasePlugin:
         else:
             Domoticz.Debugging(0)
         # Devices
-        if len(Devices) == 0:
-            for unit in self.__UNITS:
+        for unit in self.__UNITS:
+            if unit[0] not in Devices:
                 Domoticz.Device(
                     Unit=unit[0],
                     Name=unit[1],

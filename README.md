@@ -8,6 +8,9 @@ In general, if the station is supplied with `EasyWeather` software (version 1.4.
 
 ### Tested
 
+#### Alecto
+* Alecto WS-5500
+
 #### Ventus 
 * Ventus W830
 
