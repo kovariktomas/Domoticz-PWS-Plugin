@@ -78,37 +78,38 @@ Unfortunately you can connect your PWS only to **one** Domoticz server!
 If new devices are added in the plugin, you have to remove the hardware and add it again (sorry!).
 
 ## Parameters
-| Name                      | Description
-| :---                      | :---
-| **Port**                  | Port number as choosen in WS View, eg. 5000 (displayed on Hardware overview as Address)
+| Name     | Description
+| :---     | :---
+| **Port** | Port number as choosen in WS View, eg. 5000 (displayed on Hardware overview as Address)
 
 ## Devices
 ![Devices](/images/screendump.jpg)
 
 I have created as much devices as possible, so you can select your own favourites.
 
-| Name                      | Description
-| :---                      | :---
-| **Barometer (absolute)**  | Pressure (absolute) in hPa
-| **Barometer (relative)**  | Pressure (relative) in hPa
-| **Chill**                 | Chill (calculated when `Ecowitt` protocol is used)
-| **Dew point**             | Dew point (calculated when `Ecowitt` protocol is used)
-| **Gust**                  | Gust
-| **Humidity**              | Humidity
-| **Humidity (indoor)**     | Humidity (indoor)
-| **Rain**                  | Current rain rate and daily total
-| **Station**               | Format: [ip adress] ([software]): [Protocol] (`Wunderground` or `Ecowitt`), from your PWS.
-| **Solar radiation**       | Solar radiation
-| **Temp + Hum**            | Temperature and humidity
-| **Temperature**           | Temperature
-| **Temperature (indoor)**  | Temperature
-| **THB**                   | Temperature, humidity and barometer (pressure and prediction)
-| **UVI**                   | UV index
-| **UV Alert**              | UV index + warning level (calculated)
-| **Wind**                  | Wind direction, speed and gust
-| **Wind**                  | Wind direction, speed, gust, temperature and gust
-| **Wind direction**        | Wind direction
-| **Wind Speed**            | Wind speed
+| Name                     | Description
+| :---                     | :---
+| **Barometer (absolute)** | Pressure (absolute) in hPa
+| **Barometer (relative)** | Pressure (relative) in hPa
+| **Chill**                | Chill (calculated when `Ecowitt` protocol is used)
+| **Dew point**            | Dew point (calculated when `Ecowitt` protocol is used)
+| **Gust**                 | Gust
+| **Humidity**             | Humidity
+| **Humidity (indoor)**    | Humidity (indoor)
+| **Rain**                 | Current rain rate and daily total
+| **Rain rate**            | Current rain rate
+| **Station**              | Format: [ip adress] ([software]): [Protocol] (`Wunderground` or `Ecowitt`), from your PWS.
+| **Solar radiation**      | Solar radiation
+| **Temp + Hum**           | Temperature and humidity
+| **Temperature**          | Temperature
+| **Temperature (indoor)** | Temperature
+| **THB**                  | Temperature, humidity and barometer (pressure and prediction)
+| **UVI**                  | UV index
+| **UV Alert**             | UV index + warning level (calculated)
+| **Wind**                 | Wind direction, speed and gust
+| **Wind**                 | Wind direction, speed, gust, temperature and gust
+| **Wind direction**       | Wind direction
+| **Wind Speed**           | Wind speed
 
 ## Protocols
 WS View supports 2 protocols for `Customized` upload: `Wunderground` or `Ecowitt`. My information about the data to be uploaded is based on my own experience and information from:
@@ -117,14 +118,14 @@ WS View supports 2 protocols for `Customized` upload: `Wunderground` or `Ecowitt
 Information can be found at: https://feedback.weather.com/customer/en/portal/articles/2924682-pws-upload-protocol?b_id=17298.
 
 #### Not supported (yet)
-| Name                  |
-| :---                  |
-| weather               |
-| soiltempf             |
-| soilmoisture          |
-| leafwetness           |
-| visibility            |
-| Aq* (like AqNO, AqBC )|
+| Name                   |
+| :---                   |
+| weather                |
+| soiltempf              |
+| soilmoisture           |
+| leafwetness            |
+| visibility             |
+| Aq* (like AqNO, AqBC ) |
 
 #### Not used
 The following data send by the weatherstations is not used, e.g. because this is historical data which is already maintained by Domoticz, or not relevant as sensor:
@@ -141,4 +142,3 @@ The following data send by the weatherstations is not used, e.g. because this is
 
 ### Ecowitt
 Information not found yet.
-
