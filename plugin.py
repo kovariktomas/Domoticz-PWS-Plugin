@@ -5,11 +5,9 @@
 #
 # Author: Xorfor
 #
-# WU data:
-# {'weeklyrainin': '1.079', 'windspeedmph': '0.0', 'realtime': '1', 'solarradiation': '0.36', 'rtfreq': '5', 'baromin': '29.770', 'absbaromin': '29.823', 'dateutc': '2019-10-17%2016:47:39', 'tempf': '55.6', 'indoorhumidity': '67', 'windchillf': '55.6', 'UV': '0', 'softwaretype': 'EasyWeatherV1.4.4', 'PASSWORD': 'b', 'humidity': '78', 'dailyrainin': '0.169', 'action': 'updateraw', 'rainin': '0.000', 'winddir': '110', 'monthlyrainin': '7.280', 'ID': 'a', 'dewptf': '48.9', 'windgustmph': '0.0', 'indoortempf': '68.4'}
 
 """
-<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.4" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
+<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.5" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
     <params>
         <param field="Address" label="Port" width="40px" required="true" default="5000"/>
         <param field="Mode6" label="Debug" width="100px">
@@ -53,9 +51,7 @@ class BasePlugin:
     __UNIT_SWTP = 20
     __UNIT_BARR = 21
     __UNIT_BARA = 22
-    __UNIT_RIC1 = 23
-    __UNIT_RIC2 = 24
-    __UNIT_RIC3 = 25
+    __UNIT_RNRT = 23
 
     __UNITS = [
         # id, name, type, subtype, options, used
@@ -79,9 +75,7 @@ class BasePlugin:
         [__UNIT_SWTP, "Station", 243, 19, {}, __USED],
         [__UNIT_BARR, "Barometer (relative)", 243, 26, {}, __USED],
         [__UNIT_BARA, "Barometer (absolute)", 243, 26, {}, __USED],
-        # [__UNIT_RIC1, "Rain 1 (daily)", 113, 0, {}, __USED],
-        # [__UNIT_RIC2, "Rain 2 (daily)", 243, 28, {}, __USED],
-        # [__UNIT_RIC3, "Rain 3 (daily)", 243, 33, {}, __USED],
+        [__UNIT_RNRT, "Rain rate", 243, 31, {"Custom": "0;mm/h"}, __USED],
     ]
 
     def __init__(self):
@@ -133,13 +127,15 @@ class BasePlugin:
                 if len(data) > 0:
                     dataIsValid = True
                     # Get data
-                    humidity = int(data.get("humidity"))
-                    humiditystatus = humidity2status(humidity)
-                    indoorhumidity = int(data.get("indoorhumidity"))
-                    indoorhumiditystatus = humidity2status(indoorhumidity)
                     temp = round(temperature_f2iso(float(data.get("tempf"))), 1)
                     indoortemp = round(
                         temperature_f2iso(float(data.get("indoortempf"))), 1
+                    )
+                    humidity = int(data.get("humidity"))
+                    humiditystatus = humidity2status_outdoor(humidity)
+                    indoorhumidity = int(data.get("indoorhumidity"))
+                    indoorhumiditystatus = humidity2status_indoor(
+                        indoorhumidity, indoortemp
                     )
                     dewpt = round(temperature_f2iso(float(data.get("dewptf"))), 1)
                     windchill = round(
@@ -181,12 +177,14 @@ class BasePlugin:
                 if len(data) > 0:
                     dataIsValid = True
                     # Get data
-                    humidity = int(data.get("humidity"))
-                    humiditystatus = humidity2status(humidity)
-                    indoorhumidity = int(data.get("humidityin"))
-                    indoorhumiditystatus = humidity2status(indoorhumidity)
                     temp = round(temperature_f2iso(float(data.get("tempf"))), 1)
                     indoortemp = round(temperature_f2iso(float(data.get("tempinf"))), 1)
+                    humidity = int(data.get("humidity"))
+                    humiditystatus = humidity2status_outdoor(humidity)
+                    indoorhumidity = int(data.get("humidityin"))
+                    indoorhumiditystatus = humidity2status_indoor(
+                        indoorhumidity, indoortemp
+                    )
                     windspeed = round(speed_mph2iso(float(data.get("windspeedmph"))), 1)
                     windgust = round(speed_mph2iso(float(data.get("windgustmph"))), 1)
                     winddir = int(data.get("winddir"))
@@ -198,7 +196,6 @@ class BasePlugin:
                     utcdate = data.get("dateutc")
                     Domoticz.Debug("utcdate: {}".format(utcdate))
                     datePWS = utc2local(datetime.strptime(utcdate, "%Y-%m-%d+%H:%M:%S"))
-                    Domoticz.Debug("datePWS: {}".format(datePWS))
                     preciprate = round(
                         distance_inch2iso(float(data.get("rainratein"))) * 10, 2
                     )
@@ -309,8 +306,13 @@ class BasePlugin:
                 )
                 # We need the Domoticz date time
                 dateDomoticz = datetime.now()
-                if datePWS.date() == dateDomoticz.date():
-                    Domoticz.Debug("Rain can be updated!!!")
+                # Do not update around midnight +/- 5 minutes
+                Domoticz.Debug("datePWS: {}".format(datePWS))
+                Domoticz.Debug("dateDomoticz: {}".format(dateDomoticz))
+                if datePWS.date() == dateDomoticz.date() and not (
+                    (dateDomoticz.hour == 23 and dateDomoticz.minute >= 59)
+                    or (dateDomoticz.hour == 0 and dateDomoticz.minute < 1)
+                ):
                     UpdateDevice(
                         self.__UNIT_RAIN,
                         0,
@@ -318,7 +320,18 @@ class BasePlugin:
                         AlwaysUpdate=True,
                     )
                 else:
-                    Domoticz.Log("RAIN CAN NOT BE UPDATED!!!")
+                    UpdateDevice(
+                        self.__UNIT_RAIN,
+                        0,
+                        "{};{}".format(preciprate * 100, 0),
+                        AlwaysUpdate=True,
+                    )
+                UpdateDevice(
+                    self.__UNIT_RNRT,
+                    0,
+                    "{}".format(preciprate),
+                    AlwaysUpdate=True,
+                )
 
     def onStart(self):
         Domoticz.Debug("onStart")
@@ -345,7 +358,7 @@ class BasePlugin:
             Port=Parameters["Address"],
         )
         self.httpServerConn.Listen()
-        Domoticz.Log("Listening to port: {}".format(Parameters["Address"]))
+        Domoticz.Debug("Listening to port: {}".format(Parameters["Address"]))
 
 
 global _plugin
@@ -444,8 +457,18 @@ HUMIDITY_COMFORTABLE = 1
 HUMIDITY_DRY = 2
 HUMIDITY_WET = 3
 
+# Based on Mollier diagram (simplified)
+def humidity2status_indoor(hlevel, temperature):
+    if hlevel <= 30:
+        return HUMIDITY_DRY
+    if 35 <= hlevel <= 65 and 18 <= temperature <= 22:
+        return HUMIDITY_COMFORTABLE
+    if hlevel >= 70:
+        return HUMIDITY_WET
+    return HUMIDITY_NORMAL
 
-def humidity2status(hlevel):
+
+def humidity2status_outdoor(hlevel):
     if hlevel < 25:
         return HUMIDITY_DRY
     if 25 <= hlevel <= 60:
