@@ -7,7 +7,7 @@
 #
 
 """
-<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.5" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
+<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.6" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
     <params>
         <param field="Address" label="Port" width="40px" required="true" default="5000"/>
         <param field="Mode6" label="Debug" width="100px">
@@ -23,65 +23,88 @@ import Domoticz
 from datetime import datetime
 import time
 from urllib.parse import unquote
+from enum import IntEnum, unique  # , auto
+
+
+@unique
+class unit(IntEnum):
+    """
+        Device Unit numbers
+
+        Define here your units numbers. These can be used to update your devices.
+        Be sure the these have a unique number!
+    """
+
+    TEMP_IND = 1
+    THB = 2
+    HUMIDITY = 3
+    WIND1 = 4
+    TEMP_HUM = 5
+    RAIN = 6
+    SOLAR = 7
+    UVI = 8
+    DEWPOINT = 9
+    WIND2 = 10
+    CHILL = 11
+    WINDSPEED = 12
+    GUST = 13
+    TEMP = 14
+    HUMIDITY_IND = 15
+    UV_ALERT = 16
+    WIND_DIRECTION = 17
+    STATION = 20
+    BARO_REL = 21
+    BARO_ABS = 22
+    RAIN_RATE = 23
+
+@unique
+class used(IntEnum):
+    """
+        Constants which can be used to create the devices. Look at onStart where 
+        the devices are created.
+            used.NO, the user has to add this device manually
+            used.YES, the device will be directly available
+    """
+
+    NO = 0
+    YES = 1
 
 
 class BasePlugin:
     #
-    __UNUSED = 0
-    __USED = 1
-    #
     # Devices
-    __UNIT_TMP1 = 1
-    __UNIT_TMP2 = 14
-    __UNIT_THB1 = 2
-    __UNIT_HUM1 = 3
-    __UNIT_HUM2 = 15
-    __UNIT_WND1 = 4
-    __UNIT_TPHM = 5
-    __UNIT_RAIN = 6
-    __UNIT_SOLR = 7
-    __UNIT_UVID = 8
-    __UNIT_UVAT = 16
-    __UNIT_DEWP = 9
-    __UNIT_WND2 = 10
-    __UNIT_WND4 = 17
-    __UNIT_CHLL = 11
-    __UNIT_WND3 = 12
-    __UNIT_GUST = 13
-    __UNIT_SWTP = 20
-    __UNIT_BARR = 21
-    __UNIT_BARA = 22
-    __UNIT_RNRT = 23
 
     __UNITS = [
         # id, name, type, subtype, options, used
-        [__UNIT_TMP1, "Temperature (indoor)", 80, 5, {}, __USED],
-        [__UNIT_TMP2, "Temperature", 80, 5, {}, __USED],
-        [__UNIT_DEWP, "Dew point", 80, 5, {}, __USED],
-        [__UNIT_CHLL, "Chill", 80, 5, {}, __USED],
-        [__UNIT_HUM1, "Humidity", 81, 1, {}, __USED],
-        [__UNIT_HUM2, "Humidity (indoor)", 81, 1, {}, __USED],
-        [__UNIT_TPHM, "Temp + Hum", 82, 1, {}, __USED],
-        [__UNIT_THB1, "THB", 84, 1, {}, __USED],
-        [__UNIT_RAIN, "Rain", 85, 1, {}, __USED],
-        [__UNIT_WND1, "Wind", 86, 1, {}, __USED],
-        [__UNIT_WND2, "Wind", 86, 4, {}, __USED],
-        [__UNIT_UVID, "UVI", 87, 1, {}, __USED],
-        [__UNIT_UVAT, "UV Alert", 243, 22, {}, __USED],
-        [__UNIT_SOLR, "Solar radiation", 243, 2, {}, __USED],
-        [__UNIT_WND3, "Wind speed", 243, 31, {"Custom": "0;m/s"}, __USED],
-        [__UNIT_WND4, "Wind direction", 243, 31, {"Custom": "0;°"}, __USED],
-        [__UNIT_GUST, "Gust", 243, 31, {"Custom": "0;m/s"}, __USED],
-        [__UNIT_SWTP, "Station", 243, 19, {}, __USED],
-        [__UNIT_BARR, "Barometer (relative)", 243, 26, {}, __USED],
-        [__UNIT_BARA, "Barometer (absolute)", 243, 26, {}, __USED],
-        [__UNIT_RNRT, "Rain rate", 243, 31, {"Custom": "0;mm/h"}, __USED],
+        [unit.TEMP_IND, "Temperature (indoor)", 80, 5, {}, used.YES],
+        [unit.TEMP, "Temperature", 80, 5, {}, used.YES],
+        [unit.DEWPOINT, "Dew point", 80, 5, {}, used.YES],
+        [unit.CHILL, "Chill", 80, 5, {}, used.YES],
+        [unit.HUMIDITY, "Humidity", 81, 1, {}, used.YES],
+        [unit.HUMIDITY_IND, "Humidity (indoor)", 81, 1, {}, used.YES],
+        [unit.TEMP_HUM, "Temp + Hum", 82, 1, {}, used.YES],
+        [unit.THB, "THB", 84, 1, {}, used.YES],
+        [unit.RAIN, "Rain", 85, 1, {}, used.YES],
+        [unit.WIND1, "Wind", 86, 1, {}, used.YES],
+        [unit.WIND2, "Wind", 86, 4, {}, used.YES],
+        [unit.UVI, "UVI", 87, 1, {}, used.YES],
+        [unit.UV_ALERT, "UV Alert", 243, 22, {}, used.YES],
+        [unit.SOLAR, "Solar radiation", 243, 2, {}, used.YES],
+        [unit.WINDSPEED, "Wind speed", 243, 31, {"Custom": "0;m/s"}, used.YES],
+        [unit.WIND_DIRECTION, "Wind direction", 243, 31, {"Custom": "0;°"}, used.YES],
+        [unit.GUST, "Gust", 243, 31, {"Custom": "0;m/s"}, used.YES],
+        [unit.STATION, "Station", 243, 19, {}, used.YES],
+        [unit.BARO_REL, "Barometer (relative)", 243, 26, {}, used.YES],
+        [unit.BARO_ABS, "Barometer (absolute)", 243, 26, {}, used.YES],
+        [unit.RAIN_RATE, "Rain rate", 243, 31, {"Custom": "0;mm/h"}, used.YES],
     ]
 
     def __init__(self):
         self.enabled = False
         self.httpServerConn = None
         self.httpServerConns = {}
+        self.raincounter = None
+        self.prev_dailyrainin = None
 
     def onConnect(self, Connection, Status, Description):
         Domoticz.Debug(
@@ -127,47 +150,22 @@ class BasePlugin:
                 if len(data) > 0:
                     dataIsValid = True
                     # Get data
-                    temp = round(temperature_f2iso(float(data.get("tempf"))), 1)
-                    indoortemp = round(
-                        temperature_f2iso(float(data.get("indoortempf"))), 1
-                    )
+                    temp = temperature_f2iso(float(data.get("tempf")))
+                    tempin = temperature_f2iso(float(data.get("indoortempf")))
                     humidity = int(data.get("humidity"))
-                    humiditystatus = humidity2status_outdoor(humidity)
-                    indoorhumidity = int(data.get("indoorhumidity"))
-                    indoorhumiditystatus = humidity2status_indoor(
-                        indoorhumidity, indoortemp
-                    )
-                    dewpt = round(temperature_f2iso(float(data.get("dewptf"))), 1)
-                    windchill = round(
-                        temperature_f2iso(float(data.get("windchillf"))), 1
-                    )
-                    windspeed = round(speed_mph2iso(float(data.get("windspeedmph"))), 1)
-                    windgust = round(speed_mph2iso(float(data.get("windgustmph"))), 1)
+                    humidityin = int(data.get("indoorhumidity"))
+                    dewpt = temperature_f2iso(float(data.get("dewptf")))
+                    windchill = temperature_f2iso(float(data.get("windchillf")))
+                    windspeedms = speed_mph2iso(float(data.get("windspeedmph")))
+                    windgustms = speed_mph2iso(float(data.get("windgustmph")))
                     winddir = int(data.get("winddir"))
                     solarradiation = float(data.get("solarradiation"))
                     uv = int(data.get("UV"))
                     softwaretype = data.get("softwaretype")
-                    pressure = round(pressure_inches2iso(float(data.get("baromin"))))
-                    pressureabs = round(
-                        pressure_inches2iso(float(data.get("absbaromin")))
-                    )
-                    # Get the PWS date time
-                    utcdate = unquote(
-                        data.get("dateutc")
-                    )  # Remove %20 between date and time
-                    Domoticz.Debug("utcdate: {}".format(utcdate))
-                    Domoticz.Debug(
-                        "datetime.strptime(utcdate, '%Y-%m-%d %H:%M:%S'): {}".format(
-                            datetime.strptime(utcdate, "%Y-%m-%d %H:%M:%S")
-                        )
-                    )
-                    datePWS = utc2local(datetime.strptime(utcdate, "%Y-%m-%d %H:%M:%S"))
-                    preciprate = round(
-                        distance_inch2iso(float(data.get("rainin"))) * 10, 2
-                    )
-                    preciptotal = round(
-                        distance_inch2iso(float(data.get("dailyrainin"))) * 10, 1
-                    )
+                    baromrel = pressure_inches2iso(float(data.get("baromin")))
+                    baromabs = pressure_inches2iso(float(data.get("absbaromin")))
+                    rainmm = 10 * distance_inch2iso(float(data.get("rainin")))
+                    dailyrainmm = 10 * distance_inch2iso(float(data.get("dailyrainin")))
             elif strVerb == "POST":
                 protocol = "Ecowitt"
                 Domoticz.Debug("Ecowitt protocol")
@@ -177,31 +175,17 @@ class BasePlugin:
                 if len(data) > 0:
                     dataIsValid = True
                     # Get data
-                    temp = round(temperature_f2iso(float(data.get("tempf"))), 1)
-                    indoortemp = round(temperature_f2iso(float(data.get("tempinf"))), 1)
+                    temp = temperature_f2iso(float(data.get("tempf")))
+                    tempin = temperature_f2iso(float(data.get("tempinf")))
                     humidity = int(data.get("humidity"))
-                    humiditystatus = humidity2status_outdoor(humidity)
-                    indoorhumidity = int(data.get("humidityin"))
-                    indoorhumiditystatus = humidity2status_indoor(
-                        indoorhumidity, indoortemp
-                    )
-                    windspeed = round(speed_mph2iso(float(data.get("windspeedmph"))), 1)
-                    windgust = round(speed_mph2iso(float(data.get("windgustmph"))), 1)
+                    humidityin = int(data.get("humidityin"))
+                    windspeedms = speed_mph2iso(float(data.get("windspeedmph")))
+                    windgustms = speed_mph2iso(float(data.get("windgustmph")))
                     winddir = int(data.get("winddir"))
-                    pressure = round(pressure_inches2iso(float(data.get("baromrelin"))))
-                    pressureabs = round(
-                        pressure_inches2iso(float(data.get("baromabsin")))
-                    )
-                    # Get the PWS date time
-                    utcdate = data.get("dateutc")
-                    Domoticz.Debug("utcdate: {}".format(utcdate))
-                    datePWS = utc2local(datetime.strptime(utcdate, "%Y-%m-%d+%H:%M:%S"))
-                    preciprate = round(
-                        distance_inch2iso(float(data.get("rainratein"))) * 10, 2
-                    )
-                    preciptotal = round(
-                        distance_inch2iso(float(data.get("dailyrainin"))) * 10, 1
-                    )
+                    baromrel = pressure_inches2iso(float(data.get("baromrelin")))
+                    baromabs = pressure_inches2iso(float(data.get("baromabsin")))
+                    rainmm = 10 * distance_inch2iso(float(data.get("rainin")))
+                    dailyrainmm = 10 * distance_inch2iso(float(data.get("dailyrainin")))
                     softwaretype = data.get("stationtype")
                     solarradiation = float(data.get("solarradiation"))
                     uv = int(data.get("uv"))
@@ -209,13 +193,13 @@ class BasePlugin:
                     dewpt = (
                         dew_point(temp, humidity)
                         if data.get("dewptf") is None
-                        else round(temperature_f2iso(float(data.get("dewptf"))), 1)
+                        else temperature_f2iso(float(data.get("dewptf")))
                     )
                     # windchill not reported in Ecowitt
                     windchill = (
-                        wind_chill(temp, windspeed)
+                        wind_chill(temp, windspeedms)
                         if data.get("windchillf") is None
-                        else round(temperature_f2iso(float(data.get("windchillf"))), 1)
+                        else temperature_f2iso(float(data.get("windchillf")))
                     )
             else:
                 Domoticz.Error("Unknown protocol")
@@ -223,40 +207,80 @@ class BasePlugin:
             #
             if dataIsValid:
                 Domoticz.Debug("Protocol: {}".format(protocol))
+                # Reset counters
+                if self.raincounter is None:  # Domoticz (re)started.
+                    # Try to get the original counter
+                    old_values = Devices[unit.RAIN].sValue.split(";")
+                    # Set Domoticz counter to 0
+                    UpdateDevice(unit.RAIN, 0, "{};{}".format(0, 0))
+                    Domoticz.Log("old_values: {}".format(old_values))
+                    if len(old_values[0]) == 0:
+                        # Hardware first time
+                        self.raincounter = 0
+                    else:
+                        # Hardware exists so get old value
+                        self.raincounter = float(old_values[1]) - dailyrainmm
+                    self.prev_dailyrainin = dailyrainmm
+                Domoticz.Log("rainin: {}".format(rainmm))
+                Domoticz.Log("self.raincounter: {}".format(self.raincounter))
+                Domoticz.Log("dailyrainin: {}".format(dailyrainmm))
+                Domoticz.Log(
+                    "self.raincounter+dailyrainin: {}".format(
+                        self.raincounter + dailyrainmm
+                    )
+                )
+                Domoticz.Log("self.prev_dailyrainin: {}".format(self.prev_dailyrainin))
+                if dailyrainmm < self.prev_dailyrainin:
+                    self.raincounter += self.prev_dailyrainin
+                self.prev_dailyrainin = dailyrainmm
+                # Calculate statuses
+                humiditystatus = humidity2status_outdoor(humidity)
+                indoorhumiditystatus = humidity2status_indoor(humidityin, tempin)
+                pressurestatus = pressure2status(baromrel)
+                # Round calculated values for presentation
+                temp = round(temp, 1)
+                tempin = round(tempin, 1)
+                windspeedms = round(windspeedms, 1)
+                dewpt = round(dewpt, 1)
+                windchill = round(windchill, 1)
+                windgustms = round(windgustms, 1)
+                baromrel = round(baromrel)
+                baromabs = round(baromabs)
+                rainmm = round(rainmm, 2)
+                dailyrainmm = round(dailyrainmm, 2)
+                solarradiation = round(solarradiation, 1)
                 # Update devices
-                UpdateDevice(self.__UNIT_TMP1, 0, "{}".format(indoortemp))
-                UpdateDevice(self.__UNIT_TMP2, 0, "{}".format(temp))
-                UpdateDevice(self.__UNIT_HUM1, int(humidity), humiditystatus)
+                UpdateDevice(unit.TEMP_IND, 0, "{}".format(tempin))
+                UpdateDevice(unit.TEMP, 0, "{}".format(temp))
+                UpdateDevice(unit.HUMIDITY, int(humidity), "{}".format(humiditystatus))
                 UpdateDevice(
-                    self.__UNIT_HUM2, int(indoorhumidity), indoorhumiditystatus
+                    unit.HUMIDITY_IND, int(humidityin), "{}".format(indoorhumiditystatus)
                 )
-                UpdateDevice(self.__UNIT_DEWP, 0, "{}".format(dewpt))
-                UpdateDevice(self.__UNIT_CHLL, 0, "{}".format(windchill))
+                UpdateDevice(unit.DEWPOINT, 0, "{}".format(dewpt))
+                UpdateDevice(unit.CHILL, 0, "{}".format(windchill))
                 UpdateDevice(
-                    self.__UNIT_TPHM,
-                    0,
-                    "{};{};{}".format(temp, humidity, humiditystatus),
+                    unit.TEMP_HUM, 0, "{};{};{}".format(temp, humidity, humiditystatus)
                 )
                 UpdateDevice(
-                    self.__UNIT_WND1,
+                    unit.WIND1,
                     0,
                     "{};{};{};{};{};{}".format(
                         winddir,
                         bearing2status(winddir),
-                        windspeed * 10,
-                        windgust * 10,
+                        windspeedms * 10,
+                        windgustms * 10,
                         temp,
                         windchill,
                     ),
                 )
                 UpdateDevice(
-                    self.__UNIT_WND2,
+                    unit.WIND2,
                     0,
                     "{};{};{};{};{};{}".format(
                         winddir,
                         bearing2status(winddir),
-                        windspeed * 10,
-                        windgust * 10,
+                        windspeedms * 10,
+                        windgustms * 10,
                         temp,
                         windchill,
                     ),
@@ -264,74 +288,41 @@ class BasePlugin:
                 # Custom device, so we have to handle the alternative windspeed units
                 windunit = int(Settings["WindUnit"])
                 Domoticz.Debug("WindUnit: {}".format(windunit))
-                UpdateDeviceOptions(self.__UNIT_WND3, Options=speed2options(windunit))
-                UpdateDevice(
-                    self.__UNIT_WND3, 0, "{}".format(speed2unit(windspeed, windunit))
-                )
+                UpdateDeviceOptions(unit.WINDSPEED, Options=speed2options(windunit))
+                UpdateDevice(unit.WINDSPEED, 0, "{}".format(speed2unit(windspeedms, windunit)))
                 # Custom device, so we have to handle the alternative windspeed units
-                UpdateDeviceOptions(self.__UNIT_GUST, Options=speed2options(windunit))
+                UpdateDeviceOptions(unit.GUST, Options=speed2options(windunit))
+                UpdateDevice(unit.GUST, 0, "{}".format(speed2unit(windgustms, windunit)))
+                UpdateDevice(unit.GUST, 0, "{}".format(windgustms))
+                UpdateDevice(unit.WIND_DIRECTION, 0, "{}".format(winddir))
                 UpdateDevice(
-                    self.__UNIT_GUST, 0, "{}".format(speed2unit(windgust, windunit))
+                    unit.SOLAR, int(solarradiation), "{}".format(solarradiation)
                 )
-                UpdateDevice(self.__UNIT_GUST, 0, "{}".format(windgust))
-                UpdateDevice(self.__UNIT_WND4, 0, "{}".format(winddir))
-                UpdateDevice(self.__UNIT_SOLR, int(solarradiation), str(solarradiation))
-                UpdateDevice(self.__UNIT_UVID, int(uv), "{};{}".format(uv, temp))
-                UpdateDevice(self.__UNIT_UVAT, uv2status(uv), str(uv) + " UVI")
+                UpdateDevice(unit.UVI, int(uv), "{};{}".format(uv, temp))
+                UpdateDevice(unit.UV_ALERT, uv2status(uv), "{} UVI".format(uv))
                 UpdateDevice(
-                    self.__UNIT_SWTP,
+                    unit.STATION,
                     0,
                     "{} ({}): {}".format(Connection.Address, softwaretype, protocol),
                 )
                 UpdateDevice(
-                    self.__UNIT_THB1,
+                    unit.THB,
                     0,
                     "{};{};{};{};{}".format(
-                        temp,
-                        humidity,
-                        humiditystatus,
-                        pressure,
-                        pressure2status(pressure),
+                        temp, humidity, humiditystatus, baromrel, pressurestatus
                     ),
                 )
+                UpdateDevice(unit.BARO_REL, 0, "{};{}".format(baromrel, pressurestatus))
                 UpdateDevice(
-                    self.__UNIT_BARR,
-                    0,
-                    "{};{}".format(pressure, pressure2status(pressure)),
+                    unit.BARO_ABS, 0, "{};{}".format(baromabs, pressure2status(baromabs))
                 )
                 UpdateDevice(
-                    self.__UNIT_BARA,
+                    unit.RAIN,
                     0,
-                    "{};{}".format(pressureabs, pressure2status(pressureabs)),
-                )
-                # We need the Domoticz date time
-                dateDomoticz = datetime.now()
-                # Do not update around midnight +/- 5 minutes
-                Domoticz.Debug("datePWS: {}".format(datePWS))
-                Domoticz.Debug("dateDomoticz: {}".format(dateDomoticz))
-                if datePWS.date() == dateDomoticz.date() and not (
-                    (dateDomoticz.hour == 23 and dateDomoticz.minute >= 59)
-                    or (dateDomoticz.hour == 0 and dateDomoticz.minute < 1)
-                ):
-                    UpdateDevice(
-                        self.__UNIT_RAIN,
-                        0,
-                        "{};{}".format(preciprate * 100, preciptotal),
-                        AlwaysUpdate=True,
-                    )
-                else:
-                    UpdateDevice(
-                        self.__UNIT_RAIN,
-                        0,
-                        "{};{}".format(preciprate * 100, 0),
-                        AlwaysUpdate=True,
-                    )
-                UpdateDevice(
-                    self.__UNIT_RNRT,
-                    0,
-                    "{}".format(preciprate),
+                    "{};{}".format(rainmm * 100, round(self.raincounter + dailyrainmm, 3)),
                     AlwaysUpdate=True,
                 )
+                UpdateDevice(unit.RAIN_RATE, 0, "{}".format(rainmm))
 
     def onStart(self):
         Domoticz.Debug("onStart")
