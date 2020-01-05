@@ -20,9 +20,6 @@
 </plugin>
 """
 import Domoticz
-from datetime import datetime
-import time
-from urllib.parse import unquote
 from enum import IntEnum, unique  # , auto
 
 
@@ -690,9 +687,3 @@ def speed2options(unit):
             return {}
     else:
         return {}
-
-
-def utc2local(utc):
-    epoch = time.mktime(utc.timetuple())
-    offset = datetime.fromtimestamp(epoch) - datetime.utcfromtimestamp(epoch)
-    return utc + offset
