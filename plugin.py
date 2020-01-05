@@ -54,6 +54,7 @@ class unit(IntEnum):
     BARO_ABS = 22
     RAIN_RATE = 23
 
+
 @unique
 class used(IntEnum):
     """
@@ -117,7 +118,11 @@ class BasePlugin:
         self.httpServerConns[Connection.Name] = Connection
 
     def onDisconnect(self, Connection):
-        Domoticz.Debug("onDisconnect {}".format(Connection.Name))
+        Domoticz.Debug(
+            "onDisconnect {}={}:{}".format(
+                Connection.Name, Connection.Address, Connection.Port
+            )
+        )
         if Connection.Name in self.httpServerConns:
             del self.httpServerConns[Connection.Name]
 
@@ -126,8 +131,8 @@ class BasePlugin:
 
     def onMessage(self, Connection, Data):
         Domoticz.Debug(
-            "onMessage {}={}:{} {}".format(
-                Connection.Name, Connection.Address, Connection.Port, Data
+            "onMessage {}={}:{}".format(
+                Connection.Name, Connection.Address, Connection.Port
             )
         )
         DumpHTTPResponseToLog(Data)
@@ -251,7 +256,9 @@ class BasePlugin:
                 UpdateDevice(unit.TEMP, 0, "{}".format(temp))
                 UpdateDevice(unit.HUMIDITY, int(humidity), "{}".format(humiditystatus))
                 UpdateDevice(
-                    unit.HUMIDITY_IND, int(humidityin), "{}".format(indoorhumiditystatus)
+                    unit.HUMIDITY_IND,
+                    int(humidityin),
+                    "{}".format(indoorhumiditystatus),
                 )
                 UpdateDevice(unit.DEWPOINT, 0, "{}".format(dewpt))
                 UpdateDevice(unit.CHILL, 0, "{}".format(windchill))
@@ -286,10 +293,14 @@ class BasePlugin:
                 windunit = int(Settings["WindUnit"])
                 Domoticz.Debug("WindUnit: {}".format(windunit))
                 UpdateDeviceOptions(unit.WINDSPEED, Options=speed2options(windunit))
-                UpdateDevice(unit.WINDSPEED, 0, "{}".format(speed2unit(windspeedms, windunit)))
+                UpdateDevice(
+                    unit.WINDSPEED, 0, "{}".format(speed2unit(windspeedms, windunit))
+                )
                 # Custom device, so we have to handle the alternative windspeed units
                 UpdateDeviceOptions(unit.GUST, Options=speed2options(windunit))
-                UpdateDevice(unit.GUST, 0, "{}".format(speed2unit(windgustms, windunit)))
+                UpdateDevice(
+                    unit.GUST, 0, "{}".format(speed2unit(windgustms, windunit))
+                )
                 UpdateDevice(unit.GUST, 0, "{}".format(windgustms))
                 UpdateDevice(unit.WIND_DIRECTION, 0, "{}".format(winddir))
                 UpdateDevice(
@@ -311,22 +322,26 @@ class BasePlugin:
                 )
                 UpdateDevice(unit.BARO_REL, 0, "{};{}".format(baromrel, pressurestatus))
                 UpdateDevice(
-                    unit.BARO_ABS, 0, "{};{}".format(baromabs, pressure2status(baromabs))
+                    unit.BARO_ABS,
+                    0,
+                    "{};{}".format(baromabs, pressure2status(baromabs)),
                 )
                 UpdateDevice(
                     unit.RAIN,
                     0,
-                    "{};{}".format(rainmm * 100, round(self.raincounter + dailyrainmm, 3)),
+                    "{};{}".format(
+                        rainmm * 100, round(self.raincounter + dailyrainmm, 3)
+                    ),
                     AlwaysUpdate=True,
                 )
                 UpdateDevice(unit.RAIN_RATE, 0, "{}".format(rainmm))
 
     def onStart(self):
-        Domoticz.Debug("onStart")
         if Parameters["Mode6"] == "Debug":
             Domoticz.Debugging(1)
         else:
             Domoticz.Debugging(0)
+        Domoticz.Debug("onStart")
         # Devices
         for unit in self.__UNITS:
             if unit[0] not in Devices:
