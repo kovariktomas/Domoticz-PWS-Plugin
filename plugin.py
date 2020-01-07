@@ -225,7 +225,6 @@ class BasePlugin:
                     old_values = Devices[unit.RAIN].sValue.split(";")
                     # Set Domoticz counter to 0
                     UpdateDevice(unit.RAIN, 0, "{};{}".format(0, 0))
-                    Domoticz.Log("old_values: {}".format(old_values))
                     if len(old_values[0]) == 0:
                         # Hardware first time
                         self.raincounter = 0
@@ -233,15 +232,6 @@ class BasePlugin:
                         # Hardware exists so get old value
                         self.raincounter = float(old_values[1]) - dailyrainmm
                     self.prev_dailyrainin = dailyrainmm
-                Domoticz.Log("rainin: {}".format(rainmm))
-                Domoticz.Log("self.raincounter: {}".format(self.raincounter))
-                Domoticz.Log("dailyrainin: {}".format(dailyrainmm))
-                Domoticz.Log(
-                    "self.raincounter+dailyrainin: {}".format(
-                        self.raincounter + dailyrainmm
-                    )
-                )
-                Domoticz.Log("self.prev_dailyrainin: {}".format(self.prev_dailyrainin))
                 if dailyrainmm < self.prev_dailyrainin:
                     self.raincounter += self.prev_dailyrainin
                 self.prev_dailyrainin = dailyrainmm
