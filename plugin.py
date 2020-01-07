@@ -7,7 +7,7 @@
 #
 
 """
-<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.6" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
+<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.7" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
     <params>
         <param field="Address" label="Port" width="40px" required="true" default="5000"/>
         <param field="Mode6" label="Debug" width="100px">
@@ -152,22 +152,26 @@ class BasePlugin:
                 if len(data) > 0:
                     dataIsValid = True
                     # Get data
-                    temp = temperature_f2iso(float(data.get("tempf")))
-                    tempin = temperature_f2iso(float(data.get("indoortempf")))
-                    humidity = int(data.get("humidity"))
-                    humidityin = int(data.get("indoorhumidity"))
-                    dewpt = temperature_f2iso(float(data.get("dewptf")))
-                    windchill = temperature_f2iso(float(data.get("windchillf")))
-                    windspeedms = speed_mph2iso(float(data.get("windspeedmph")))
-                    windgustms = speed_mph2iso(float(data.get("windgustmph")))
-                    winddir = int(data.get("winddir"))
-                    solarradiation = float(data.get("solarradiation"))
-                    uv = int(data.get("UV"))
+                    temp = temperature_f2iso(float_or_none(data.get("tempf")))
+                    tempin = temperature_f2iso(float_or_none(data.get("indoortempf")))
+                    humidity = int_or_none(data.get("humidity"))
+                    humidityin = int_or_none(data.get("indoorhumidity"))
+                    dewpt = temperature_f2iso(float_or_none(data.get("dewptf")))
+                    windchill = temperature_f2iso(float_or_none(data.get("windchillf")))
+                    windspeedms = speed_mph2iso(float_or_none(data.get("windspeedmph")))
+                    windgustms = speed_mph2iso(float_or_none(data.get("windgustmph")))
+                    winddir = int_or_none(data.get("winddir"))
+                    solarradiation = float_or_none(data.get("solarradiation"))
+                    uv = int_or_none(data.get("UV"))
                     softwaretype = data.get("softwaretype")
-                    baromrel = pressure_inches2iso(float(data.get("baromin")))
-                    baromabs = pressure_inches2iso(float(data.get("absbaromin")))
-                    rainmm = 10 * distance_inch2iso(float(data.get("rainin")))
-                    dailyrainmm = 10 * distance_inch2iso(float(data.get("dailyrainin")))
+                    baromrel = pressure_inches2iso(float_or_none(data.get("baromin")))
+                    baromabs = pressure_inches2iso(
+                        float_or_none(data.get("absbaromin"))
+                    )
+                    rainmm = 10 * distance_inch2iso(float_or_none(data.get("rainin")))
+                    dailyrainmm = 10.0 * distance_inch2iso(
+                        float_or_none(data.get("dailyrainin"))
+                    )
             elif strVerb == "POST":
                 protocol = "Ecowitt"
                 Domoticz.Debug("Ecowitt protocol")
@@ -177,31 +181,37 @@ class BasePlugin:
                 if len(data) > 0:
                     dataIsValid = True
                     # Get data
-                    temp = temperature_f2iso(float(data.get("tempf")))
-                    tempin = temperature_f2iso(float(data.get("tempinf")))
-                    humidity = int(data.get("humidity"))
-                    humidityin = int(data.get("humidityin"))
-                    windspeedms = speed_mph2iso(float(data.get("windspeedmph")))
-                    windgustms = speed_mph2iso(float(data.get("windgustmph")))
-                    winddir = int(data.get("winddir"))
-                    baromrel = pressure_inches2iso(float(data.get("baromrelin")))
-                    baromabs = pressure_inches2iso(float(data.get("baromabsin")))
-                    rainmm = 10 * distance_inch2iso(float(data.get("rainin")))
-                    dailyrainmm = 10 * distance_inch2iso(float(data.get("dailyrainin")))
+                    temp = temperature_f2iso(float_or_none(data.get("tempf")))
+                    tempin = temperature_f2iso(float_or_none(data.get("tempinf")))
+                    humidity = int_or_none(data.get("humidity"))
+                    humidityin = int_or_none(data.get("humidityin"))
+                    windspeedms = speed_mph2iso(float_or_none(data.get("windspeedmph")))
+                    windgustms = speed_mph2iso(float_or_none(data.get("windgustmph")))
+                    winddir = int_or_none(data.get("winddir"))
+                    baromrel = pressure_inches2iso(
+                        float_or_none(data.get("baromrelin"))
+                    )
+                    baromabs = pressure_inches2iso(
+                        float_or_none(data.get("baromabsin"))
+                    )
+                    rainmm = 10 * distance_inch2iso(float_or_none(data.get("rainin")))
+                    dailyrainmm = 10 * distance_inch2iso(
+                        float_or_none(data.get("dailyrainin"))
+                    )
                     softwaretype = data.get("stationtype")
-                    solarradiation = float(data.get("solarradiation"))
-                    uv = int(data.get("uv"))
+                    solarradiation = float_or_none(data.get("solarradiation"))
+                    uv = int_or_none(data.get("uv"))
                     # dewpt not reported in Ecowitt
                     dewpt = (
                         dew_point(temp, humidity)
                         if data.get("dewptf") is None
-                        else temperature_f2iso(float(data.get("dewptf")))
+                        else temperature_f2iso(float_or_none(data.get("dewptf")))
                     )
                     # windchill not reported in Ecowitt
                     windchill = (
                         wind_chill(temp, windspeedms)
                         if data.get("windchillf") is None
-                        else temperature_f2iso(float(data.get("windchillf")))
+                        else temperature_f2iso(float_or_none(data.get("windchillf")))
                     )
             else:
                 Domoticz.Error("Unknown protocol")
@@ -240,24 +250,24 @@ class BasePlugin:
                 indoorhumiditystatus = humidity2status_indoor(humidityin, tempin)
                 pressurestatus = pressure2status(baromrel)
                 # Round calculated values for presentation
-                temp = round(temp, 1)
-                tempin = round(tempin, 1)
-                windspeedms = round(windspeedms, 1)
-                dewpt = round(dewpt, 1)
-                windchill = round(windchill, 1)
-                windgustms = round(windgustms, 1)
-                baromrel = round(baromrel)
-                baromabs = round(baromabs)
-                rainmm = round(rainmm, 2)
-                dailyrainmm = round(dailyrainmm, 2)
-                solarradiation = round(solarradiation, 1)
+                temp = round(temp, 1) if temp is not None else None
+                tempin = round(tempin, 1) if tempin is not None else None
+                windspeedms = round(windspeedms, 1) if windspeedms is not None else None
+                dewpt = round(dewpt, 1) if dewpt is not None else None
+                windchill = round(windchill, 1) if windchill is not None else None
+                windgustms = round(windgustms, 1) if windgustms is not None else None
+                baromrel = round(baromrel) if baromrel is not None else None
+                baromabs = round(baromabs) if baromabs is not None else None
+                rainmm = round(rainmm, 2) if rainmm is not None else None
+                dailyrainmm = round(dailyrainmm, 2) if dailyrainmm is not None else None
+                solarradiation = round(solarradiation, 1) if solarradiation is not None else None
                 # Update devices
                 UpdateDevice(unit.TEMP_IND, 0, "{}".format(tempin))
                 UpdateDevice(unit.TEMP, 0, "{}".format(temp))
-                UpdateDevice(unit.HUMIDITY, int(humidity), "{}".format(humiditystatus))
+                UpdateDevice(unit.HUMIDITY, int(humidity) if humidity is not None else 0, "{}".format(humiditystatus))
                 UpdateDevice(
                     unit.HUMIDITY_IND,
-                    int(humidityin),
+                    int(humidityin) if humidityin is not None else 0,
                     "{}".format(indoorhumiditystatus),
                 )
                 UpdateDevice(unit.DEWPOINT, 0, "{}".format(dewpt))
@@ -270,9 +280,9 @@ class BasePlugin:
                     0,
                     "{};{};{};{};{};{}".format(
                         winddir,
-                        bearing2status(winddir),
-                        windspeedms * 10,
-                        windgustms * 10,
+                        bearing2status(winddir) if winddir is not None else None,
+                        windspeedms * 10 if windspeedms is not None else None,
+                        windgustms * 10 if windgustms is not None else None,
                         temp,
                         windchill,
                     ),
@@ -282,9 +292,9 @@ class BasePlugin:
                     0,
                     "{};{};{};{};{};{}".format(
                         winddir,
-                        bearing2status(winddir),
-                        windspeedms * 10,
-                        windgustms * 10,
+                        bearing2status(winddir) if winddir is not None else None,
+                        windspeedms * 10 if windspeedms is not None else None,
+                        windgustms * 10 if windgustms is not None else None,
                         temp,
                         windchill,
                     ),
@@ -304,10 +314,10 @@ class BasePlugin:
                 UpdateDevice(unit.GUST, 0, "{}".format(windgustms))
                 UpdateDevice(unit.WIND_DIRECTION, 0, "{}".format(winddir))
                 UpdateDevice(
-                    unit.SOLAR, int(solarradiation), "{}".format(solarradiation)
+                    unit.SOLAR, int(solarradiation) if solarradiation is not None else 0, "{}".format(solarradiation)
                 )
-                UpdateDevice(unit.UVI, int(uv), "{};{}".format(uv, temp))
-                UpdateDevice(unit.UV_ALERT, uv2status(uv), "{} UVI".format(uv))
+                UpdateDevice(unit.UVI, int(uv) if uv is not None else 0, "{};{}".format(uv, temp))
+                UpdateDevice(unit.UV_ALERT, uv2status(uv) if uv is not None else 0, "{} UVI".format(uv))
                 UpdateDevice(
                     unit.STATION,
                     0,
@@ -462,6 +472,8 @@ HUMIDITY_WET = 3
 
 # Based on Mollier diagram (simplified)
 def humidity2status_indoor(hlevel, temperature):
+    if hlevel is None or temperature is None:
+        return None
     if hlevel <= 30:
         return HUMIDITY_DRY
     if 35 <= hlevel <= 65 and 18 <= temperature <= 22:
@@ -471,12 +483,14 @@ def humidity2status_indoor(hlevel, temperature):
     return HUMIDITY_NORMAL
 
 
-def humidity2status_outdoor(hlevel):
-    if hlevel < 25:
+def humidity2status_outdoor(value):
+    if value is None:
+        return None
+    if value < 25:
         return HUMIDITY_DRY
-    if 25 <= hlevel <= 60:
+    if 25 <= value <= 60:
         return HUMIDITY_COMFORTABLE
-    if hlevel > 60:
+    if value > 60:
         return HUMIDITY_WET
     return HUMIDITY_NORMAL
 
@@ -488,7 +502,10 @@ def temperature_f2iso(value):
     Returns:
         temperature in Celsius
     """
-    return (value - 32) / 1.8
+    if value is None:
+        return None
+    else:
+        return (value - 32) / 1.8
 
 
 def speed_mph2iso(value):
@@ -498,7 +515,10 @@ def speed_mph2iso(value):
     Returns:
         speed in m/s
     """
-    return value * 0.44704
+    if value is None:
+        return None
+    else:
+        return value * 0.44704
 
 
 def bearing2status(d):
@@ -544,18 +564,22 @@ BARO_FORECASTS = {
 }
 
 
-def pressure2status(pressure):
-    if pressure < 1000:
+def pressure2status(value):
+    if value is None:
+        return None
+    if value < 1000:
         return BARO_FORECAST_RAIN
-    elif pressure < 1020:
+    elif value < 1020:
         return BARO_FORECAST_CLOUDY
-    elif pressure < 1030:
+    elif value < 1030:
         return BARO_FORECAST_PARTLYCLOUDY
     else:
         return BARO_FORECAST_SUNNY
 
 
 def uv2status(value):
+    if value is None:
+        return None
     if value < 3:
         return 0
     elif value < 6:
@@ -575,7 +599,10 @@ def pressure_inches2iso(value):
     Returns:
         pressure in hPa
     """
-    return value * 33.86
+    if value is None:
+        return None
+    else:
+        return value * 33.86
 
 
 def distance_inch2iso(value):
@@ -585,7 +612,10 @@ def distance_inch2iso(value):
     Returns:
         Distance in cm
     """
-    return value * 2.54
+    if value is None:
+        return None
+    else:
+        return value * 2.54
 
 
 def dew_point(t, h):
@@ -702,3 +732,17 @@ def speed2options(unit):
             return {}
     else:
         return {}
+
+
+def float_or_none(value):
+    try:
+        return float(value)
+    except:
+        return None
+
+
+def int_or_none(value):
+    try:
+        return int(value)
+    except:
+        return None
