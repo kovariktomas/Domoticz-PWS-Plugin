@@ -9,6 +9,7 @@ In general, if the station is supplied with `EasyWeather` software (version 1.4.
 ### Tested
 
 * Alecto WS-5500
+* Garni 940
 * Ventus W830
 * Waldbeck Halley Professional Weather Station
 
@@ -21,6 +22,7 @@ In general, if the station is supplied with `EasyWeather` software (version 1.4.
 * 1.4.6
 * 1.4.7
 * 1.4.8
+* 1.4.9
 
 ## Prerequisites
 Your PWS needs to be connected to your router by `WS View` (and also the 'older' `WS Tool`). With this application you can connect your PWS to the router, so that your PWS can upload weather data to Domoticz.
