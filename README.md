@@ -119,7 +119,7 @@ I have created as much devices as possible, so you can select your own favourite
 WS View supports 2 protocols for `Customized` upload: `Wunderground` or `Ecowitt`. My information about the data to be uploaded is based on my own experience and information from:
 
 ### Wunderground
-Information can be found at: https://feedback.weather.com/customer/en/portal/articles/2924682-pws-upload-protocol?b_id=17298.
+Information can be found at: https://support.weather.com/s/article/PWS-Upload-Protocol?language=en_US.
 
 #### Not supported (yet)
 | Name                   |
