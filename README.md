@@ -14,16 +14,10 @@ In general, if the station is supplied with `EasyWeather` software (version 1.4.
 * Waldbeck Halley Professional Weather Station
 
 #### EasyWeather
-* 1.4.1
-* 1.4.2
-* 1.4.3
-* 1.4.4
-* 1.4.5
-* 1.4.6
-* 1.4.7
-* 1.4.8
-* 1.4.9
+* 1.4.x
 * 1.5.0
+* 1.5.1
+* 1.5.2
 
 ## Prerequisites
 Your PWS needs to be connected to your router by `WS View` (and also the 'older' `WS Tool`). With this application you can connect your PWS to the router, so that your PWS can upload weather data to Domoticz.
