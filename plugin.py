@@ -7,7 +7,7 @@
 #
 
 """
-<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.7" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
+<plugin key="xfr_pws" name="PWS" author="Xorfor" version="1.0.8" wikilink="https://github.com/Xorfor/Domoticz-PWS-Plugin">
     <params>
         <param field="Address" label="Port" width="40px" required="true" default="5000"/>
         <param field="Mode6" label="Debug" width="100px">
@@ -162,7 +162,7 @@ class BasePlugin:
                     windgustms = speed_mph2iso(float_or_none(data.get("windgustmph")))
                     winddir = int_or_none(data.get("winddir"))
                     solarradiation = float_or_none(data.get("solarradiation"))
-                    uv = int_or_none(data.get("UV"))
+                    uv = float_or_none(data.get("UV"))
                     softwaretype = data.get("softwaretype")
                     baromrel = pressure_inches2iso(float_or_none(data.get("baromin")))
                     baromabs = pressure_inches2iso(
@@ -200,7 +200,7 @@ class BasePlugin:
                     )
                     softwaretype = data.get("stationtype")
                     solarradiation = float_or_none(data.get("solarradiation"))
-                    uv = int_or_none(data.get("uv"))
+                    uv = float_or_none(data.get("uv"))
                     # dewpt not reported in Ecowitt
                     dewpt = (
                         dew_point(temp, humidity)
