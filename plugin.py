@@ -353,8 +353,8 @@ class BasePlugin:
                 )
                 UpdateDevice(
                     unit.BATTERY,
-                    lowbatt*10,
-                    "{}".format(lowbatt),
+                    int(lowbatt*10),
+                    "Výměna když hodnota je > 0: {}".format(lowbatt),
                 )
                 UpdateDevice(
                     unit.THB,
@@ -471,7 +471,7 @@ def DumpHTTPResponseToLog(httpDict):
                 Domoticz.Debug("    '{}: '{}'".format(x, httpDict[x]))
 
 
-def UpdateDevice(Unit, nValue, sValue, TimedOut=0, AlwaysUpdate=False):
+def UpdateDevice(Unit, nValue, sValue, TimedOut=0, AlwaysUpdate=True):
     # Make sure that the Domoticz device still exists (they can be deleted) before updating it
     if Unit in Devices:
         if (
