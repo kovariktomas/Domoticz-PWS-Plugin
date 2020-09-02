@@ -103,7 +103,7 @@ class BasePlugin:
         [unit.RAIN_RATE, "Míra srážek", 243, 31, {"Custom": "0;mm/h"}, used.YES],
         [unit.HEAT_INDEX, "Tepelný index", 80, 5, {}, used.YES],
         [unit.HEAT_INDEX_IN, "Tepelný index (vnitřní)", 80, 5, {}, used.YES],
-        [unit.BATTERY, "Viměnit baterie", 243, 22, {}, used.YES],
+        [unit.BATTERY, "Vyměnit baterie", 243, 22, {}, used.YES],
     ]
 
     def __init__(self):
@@ -353,7 +353,7 @@ class BasePlugin:
                 )
                 UpdateDevice(
                     unit.BATTERY,
-                    lowbatt,
+                    lowbatt*10,
                     "{}".format(lowbatt),
                 )
                 UpdateDevice(
