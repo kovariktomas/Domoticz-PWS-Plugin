@@ -174,7 +174,7 @@ class BasePlugin:
                     winddir = int_or_none(data.get("winddir"))
                     solarradiation = float_or_none(data.get("solarradiation"))
                     uv = float_or_none(data.get("UV"))
-                    softwaretype = data.get("softwaretype")
+                    waretype = data.get("softwaretype")
                     baromrel = pressure_inches2iso(float_or_none(data.get("baromin")))
                     baromabs = pressure_inches2iso(
                         float_or_none(data.get("baromin"))
@@ -183,13 +183,13 @@ class BasePlugin:
                     dailyrainmm = 10.0 * distance_inch2iso(
                         float_or_none(data.get("dailyrainin"))
                     )
-                    weeklyrainin = 10.0 * distance_inch2iso(
+                    weeklyraininmm = 10.0 * distance_inch2iso(
                         float_or_none(data.get("weeklyrainin"))
                     )
-                    monthlyrainin = 10.0 * distance_inch2iso(
+                    monthlyraininmm = 10.0 * distance_inch2iso(
                         float_or_none(data.get("monthlyrainin"))
                     )
-                    yearlyrainin = 10.0 * distance_inch2iso(
+                    yearlyraininmm = 10.0 * distance_inch2iso(
                         float_or_none(data.get("yearlyrainin"))
                     )
                     lowbatt = data.get("lowbatt")
@@ -349,7 +349,7 @@ class BasePlugin:
                 UpdateDevice(
                     unit.STATION,
                     0,
-                    "{} ({}): {}".format(Connection.Address, softwaretype, protocol),
+                    "{} ({}): {}: [{},{},{},{},{}]".format(Connection.Address, softwaretype, protocol, rainmm, dailyrainmm, weeklyraininmm, monthlyraininmm, yearlyraininmm),
                 )
                 UpdateDevice(
                     unit.BATTERY,
